@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recursos de Claude</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F2F2F2; --black: #000; --violet: #A100FF; --plum: #350058;
+    --text: #1a1a1a; --white: #FFF; --sidebar-w: 240px;
+  }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  header { background: var(--black); color: var(--white); padding: 28px 32px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .header-titles h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header-titles h1 span { color: var(--violet); }
+  .header-titles p { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
+  .search-wrap { flex: 0 0 280px; }
+  #search { width: 100%; padding: 9px 14px; border-radius: 6px; border: 1.5px solid #333; background: #111; color: var(--white); font-size: 0.9rem; outline: none; transition: border-color .2s; }
+  #search:focus { border-color: var(--violet); }
+  #search::placeholder { color: #666; }
+  .layout { display: flex; flex: 1; }
+  nav { width: var(--sidebar-w); background: var(--black); padding: 24px 0; flex-shrink: 0; min-height: calc(100vh - 88px); }
+  nav ul { list-style: none; }
+  nav ul li a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #ccc; text-decoration: none; font-size: 0.88rem; font-weight: 500; border-left: 3px solid transparent; transition: all .18s; cursor: pointer; }
+  nav ul li a:hover { color: var(--white); background: rgba(161,0,255,0.12); border-left-color: var(--violet); }
+  nav ul li a.active { color: var(--white); background: rgba(161,0,255,0.2); border-left-color: var(--violet); }
+  main { flex: 1; padding: 36px 40px; max-width: 960px; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .section-header { border-bottom: 2px solid var(--violet); padding-bottom: 12px; margin-bottom: 28px; }
+  .section-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--plum); }
+  .section-header .badge { display: inline-block; background: var(--violet); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 2px 10px; border-radius: 20px; margin-left: 10px; vertical-align: middle; letter-spacing: .04em; }
+  .content p { line-height: 1.75; margin-bottom: 16px; font-size: 0.95rem; }
+  .content h3 { font-size: 1.05rem; font-weight: 700; color: var(--plum); margin: 28px 0 10px; }
+  .content ul, .content ol { padding-left: 20px; margin-bottom: 16px; }
+  .content ul li, .content ol li { margin-bottom: 8px; line-height: 1.65; font-size: 0.93rem; }
+  pre { background: var(--plum); color: var(--bg); border-left: 4px solid var(--violet); border-radius: 8px; padding: 18px 20px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6; margin: 16px 0 24px; white-space: pre; }
+  code { background: rgba(161,0,255,0.1); color: var(--plum); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; }
+  pre code { background: none; color: inherit; padding: 0; }
+  .callout { border-radius: 8px; padding: 14px 18px; margin: 18px 0; font-size: 0.91rem; line-height: 1.65; display: flex; gap: 12px; align-items: flex-start; }
+  .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .callout.tip  { background: #f0e6ff; border-left: 4px solid var(--violet); }
+  .callout.warn { background: #fff4e0; border-left: 4px solid #e6940a; }
+  .callout.info { background: #e6f0ff; border-left: 4px solid #2979ff; }
+  .callout.ok   { background: #e6f9ee; border-left: 4px solid #1db954; }
+  .callout.err  { background: #ffeaea; border-left: 4px solid #e53935; }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0 24px; font-size: 0.88rem; }
+  th { background: var(--plum); color: var(--white); padding: 11px 14px; text-align: left; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid #ddd; vertical-align: top; }
+  tr:nth-child(even) td { background: #eaeaea; }
+  tr:hover td { background: #e0d0f5; }
+  .dir-tree { background: var(--plum); color: var(--bg); border-left: 4px solid var(--violet); border-radius: 8px; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.8; margin: 16px 0 24px; white-space: pre; overflow-x: auto; display: block; }
+  .dir-tree .dir  { color: #c9a0ff; font-weight: bold; }
+  .dir-tree .file { color: #f2f2f2; }
+  .dir-tree .note { color: #aaa; font-style: italic; }
+  .cli-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  .cli-table tr { border-bottom: 1px solid #ddd; }
+  .cli-table tr:last-child { border-bottom: none; }
+  .cli-table td { padding: 9px 12px; vertical-align: top; }
+  .cli-table tr:nth-child(even) td { background: #ececec; }
+  .cli-table tr:hover td { background: #e0d0f5; }
+  .cli-cmd { font-family: 'Courier New', monospace; font-size: 0.82rem; color: var(--white); background: var(--plum); padding: 3px 9px; border-radius: 5px; white-space: nowrap; border-left: 3px solid var(--violet); }
+  .cli-desc { color: #333; line-height: 1.5; }
+  .step { display: flex; gap: 16px; margin-bottom: 28px; align-items: flex-start; }
+  .step-num { background: var(--violet); color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .step-body { flex: 1; }
+  .step-body h4 { font-size: 0.97rem; font-weight: 700; color: var(--plum); margin-bottom: 6px; }
+  .step-body p  { font-size: 0.91rem; line-height: 1.65; margin-bottom: 8px; }
+
+  /* TROUBLESHOOTING */
+  .trouble-block { background: #fff; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 20px; overflow: hidden; }
+  .trouble-header { background: var(--plum); color: #fff; padding: 12px 18px; font-weight: 700; font-size: 0.92rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+  .trouble-header:hover { background: #4a0075; }
+  .trouble-header .arrow { transition: transform .2s; font-size: 0.8rem; }
+  .trouble-header.open .arrow { transform: rotate(90deg); }
+  .trouble-body { display: none; padding: 18px; }
+  .trouble-body.open { display: block; }
+  .trouble-tag { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 10px; vertical-align: middle; }
+  .tag-skill  { background: #f0e6ff; color: var(--plum); }
+  .tag-hook   { background: #fff4e0; color: #b36200; }
+  .tag-mcp    { background: #e6f0ff; color: #1a56cc; }
+  .tag-claude { background: #e6f9ee; color: #136b34; }
+  .tag-gen    { background: #f2f2f2; color: #555; }
+
+  /* GLOSARIO */
+  .glosario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 28px; }
+  .glos-card { background: #fff; border-radius: 8px; border-top: 3px solid var(--violet); padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .glos-term { font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--violet); margin-bottom: 6px; }
+  .glos-def  { font-size: 0.88rem; line-height: 1.6; color: #333; }
+  .glos-example { font-size: 0.78rem; color: #777; margin-top: 6px; font-style: italic; }
+
+  /* QUIZ */
+  .quiz-wrap { max-width: 680px; }
+  .quiz-q { background: #fff; border-radius: 10px; border-left: 4px solid var(--violet); padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .quiz-q .q-text { font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; color: var(--plum); }
+  .quiz-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; margin-bottom: 6px; cursor: pointer; border: 2px solid #e0e0e0; background: #fafafa; transition: all .15s; font-size: 0.88rem; }
+  .quiz-option:hover { border-color: var(--violet); background: #f5eaff; }
+  .quiz-option.selected { border-color: var(--violet); background: #f0e0ff; }
+  .quiz-option.correct  { border-color: #1db954; background: #e6f9ee; color: #136b34; font-weight: 600; }
+  .quiz-option.wrong    { border-color: #e53935; background: #ffeaea; color: #b71c1c; }
+  .quiz-option.disabled { pointer-events: none; opacity: .6; }
+  .quiz-feedback { display: none; font-size: 0.84rem; margin-top: 8px; padding: 8px 12px; border-radius: 6px; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok  { background: #e6f9ee; color: #136b34; border-left: 3px solid #1db954; }
+  .quiz-feedback.bad { background: #ffeaea; color: #b71c1c; border-left: 3px solid #e53935; }
+  .quiz-btn { background: var(--violet); color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background .15s; }
+  .quiz-btn:hover { background: var(--plum); }
+  .quiz-btn:disabled { background: #ccc; cursor: not-allowed; }
+  .quiz-result { display: none; background: var(--plum); color: #fff; border-radius: 12px; padding: 28px 32px; margin-top: 20px; text-align: center; }
+  .quiz-result.show { display: block; }
+  .quiz-score { font-size: 3rem; font-weight: 900; color: var(--violet); margin: 8px 0; }
+  .quiz-verdict { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+  .quiz-msg { font-size: 0.9rem; line-height: 1.7; color: #ddd; }
+  .quiz-restart { background: var(--violet); color: #fff; border: none; padding: 10px 28px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 16px; }
+  .quiz-restart:hover { background: #7a00cc; }
+
+  .no-results { display: none; text-align: center; padding: 60px 20px; color: #888; }
+  footer { background: var(--black); color: #666; text-align: center; font-size: 0.78rem; padding: 14px; letter-spacing: .03em; }
+  footer span { color: var(--violet); }
+  @media (max-width: 700px) { nav { width: 180px; } main { padding: 24px 16px; } .glosario-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-titles">
+      <h1>Recursos de <span>Claude</span></h1>
+      <p>Documentación técnica de referencia</p>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="🔍  Buscar en la documentación...">
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav>
+    <ul id="nav-list">
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Conceptos</li>
+      <li><a class="nav-link active" data-section="glosario"      href="#"><span>📖</span> Glosario</a></li>
+      <li><a class="nav-link"        data-section="skills"        href="#"><span>🧩</span> Skills</a></li>
+      <li><a class="nav-link"        data-section="claudemd"      href="#"><span>📄</span> CLAUDE.md</a></li>
+      <li><a class="nav-link"        data-section="agente"        href="#"><span>🤖</span> Agente</a></li>
+      <li><a class="nav-link"        data-section="hooks"         href="#"><span>🪝</span> Hooks</a></li>
+      <li><a class="nav-link"        data-section="mcp"           href="#"><span>🔌</span> MCP Servers</a></li>
+      <li><a class="nav-link"        data-section="slash"         href="#"><span>⚡</span> Slash Commands</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Referencia</li>
+      <li><a class="nav-link"        data-section="directorios"   href="#"><span>📁</span> Directorios</a></li>
+      <li><a class="nav-link"        data-section="cheatsheet"    href="#"><span>📋</span> CLI Cheat Sheet</a></li>
+      <li><a class="nav-link"        data-section="troubleshoot"  href="#"><span>🔧</span> Troubleshooting</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Práctica</li>
+      <li><a class="nav-link"        data-section="impl"          href="#"><span>🚀</span> Implementación</a></li>
+      <li><a class="nav-link"        data-section="quiz"          href="#"><span>🎯</span> Quiz</a></li>
+    </ul>
+  </nav>
+
+  <main id="main-content">
+
+    <!-- ══ GLOSARIO ══ -->
+    <div class="section active" id="section-glosario">
+      <div class="section-header"><h2>📖 Glosario <span class="badge">Términos clave</span></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Términos del ecosistema Claude Code — todo lo que necesitás entender para leer esta documentación sin googlear cada dos líneas.</div></div>
+
+        <div class="glosario-grid">
+
+          <div class="glos-card">
+            <div class="glos-term">Context Window</div>
+            <div class="glos-def">La cantidad máxima de texto (tokens) que Claude puede "ver" a la vez en una conversación. CLAUDE.md, skills activas, historial y archivos leídos compiten por este espacio limitado.</div>
+            <div class="glos-example">Si el contexto se llena, Claude puede "olvidar" instrucciones de más arriba en la conversación</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Token</div>
+            <div class="glos-def">Unidad básica con la que los modelos de lenguaje procesan texto. Aproximadamente 4 caracteres en inglés, 3 en español. El context window se mide en tokens, no en palabras.</div>
+            <div class="glos-example">Un CLAUDE.md de 500 palabras consume ~650 tokens del contexto en cada conversación</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Frontmatter</div>
+            <div class="glos-def">Bloque de metadatos al inicio de un archivo Markdown, delimitado por <code>---</code>. En Claude Code se usa para definir el <code>name</code>, <code>description</code> y campos opcionales de skills y comandos.</div>
+            <div class="glos-example">El bloque <code>---name: pr-review---</code> al inicio de un SKILL.md es el frontmatter</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Semantic Matching</div>
+            <div class="glos-def">El mecanismo por el cual Claude compara tu solicitud con las descripciones de las skills disponibles para decidir cuál activar. No busca palabras exactas — interpreta intención y significado.</div>
+            <div class="glos-example">"revisá el PR" puede activar una skill descrita como "reviews code changes before merge"</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Skill</div>
+            <div class="glos-def">Archivo SKILL.md que le enseña a Claude cómo realizar una tarea específica. Se activa automáticamente cuando Claude detecta que tu solicitud coincide con su descripción. No requiere invocación manual.</div>
+            <div class="glos-example">Una skill de <code>pr-review</code> se activa sola cuando pedís revisar un PR</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Agente</div>
+            <div class="glos-def">Instancia de Claude que opera con autonomía dentro de un contexto de ejecución: puede invocar herramientas, leer y escribir archivos, ejecutar comandos y encadenar acciones para completar una tarea compleja sin intervención continua.</div>
+            <div class="glos-example">Claude refactorizando un módulo entero por su cuenta, archivo por archivo, verificando que compile</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Subagente</div>
+            <div class="glos-def">Instancia de Claude lanzada por el agente principal para ejecutar una tarea delegada en un contexto completamente aislado. Recibe instrucciones, trabaja de forma independiente y devuelve resultados sin "ver" la conversación principal.</div>
+            <div class="glos-example">El agente principal delega "escribir los tests" a un subagente mientras continúa con otra tarea</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Execution Context</div>
+            <div class="glos-def">El entorno aislado en el que opera un agente o subagente: qué herramientas tiene disponibles, qué instrucciones recibió y cuál es el estado de su conversación. Cada subagente tiene el suyo propio, separado del principal.</div>
+            <div class="glos-example">El subagente de tests no "ve" el historial de conversación del agente principal</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">MCP (Model Context Protocol)</div>
+            <div class="glos-def">Protocolo abierto estándar que define cómo los modelos de lenguaje se comunican con herramientas y servicios externos. Permite a Claude conectarse a bases de datos, APIs y servicios sin código de integración personalizado.</div>
+            <div class="glos-example">Un MCP server de PostgreSQL permite a Claude ejecutar SQL queries directamente contra una base de datos</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">MCP Server</div>
+            <div class="glos-def">Proceso externo que implementa el protocolo MCP y expone capacidades (Tools, Resources, Prompts) que Claude puede usar durante una tarea. Se configura en <code>settings.json</code> y corre como proceso separado al iniciar Claude Code.</div>
+            <div class="glos-example"><code>@modelcontextprotocol/server-github</code> expone la API de GitHub como tools que Claude puede invocar</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Hook</div>
+            <div class="glos-def">Script o comando que Claude Code ejecuta automáticamente cuando ocurre un evento específico — sin que el usuario lo pida. Los hooks son event-driven: se configuran una vez y se disparan solos cada vez que se cumple la condición.</div>
+            <div class="glos-example">Un hook <code>PostToolUse</code> corre el linter cada vez que Claude guarda un archivo</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Event-driven</div>
+            <div class="glos-def">Paradigma donde una acción se dispara automáticamente en respuesta a un evento, sin intervención manual. Los hooks de Claude Code siguen este paradigma: reaccionan a acciones de Claude, no a pedidos del usuario.</div>
+            <div class="glos-example">El evento "Claude usó la herramienta Write" dispara automáticamente el hook de validación</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Matcher</div>
+            <div class="glos-def">Patrón en la configuración de hooks que define qué herramienta o evento debe ocurrir para que el hook se active. Soporta nombres exactos y múltiples valores separados por <code>|</code>.</div>
+            <div class="glos-example"><code>"matcher": "Write|Edit"</code> activa el hook cuando Claude escribe o edita archivos, pero no en Bash o Read</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Slash Command</div>
+            <div class="glos-def">Instrucción predefinida que el usuario invoca manualmente escribiendo <code>/nombre</code> en la conversación. A diferencia de las skills, no se activan automáticamente — el usuario decide cuándo y con qué argumentos ejecutarlos.</div>
+            <div class="glos-example"><code>/changelog 2.4.0</code> genera el changelog de esa versión pasando <code>2.4.0</code> como argumento</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Progressive Disclosure</div>
+            <div class="glos-def">Técnica de organización donde solo se carga el contenido esencial inicialmente, y el detalle adicional se incorpora bajo demanda. Aplicado a skills: SKILL.md tiene lo esencial, la carpeta <code>references/</code> tiene el detalle extenso.</div>
+            <div class="glos-example">La guía de arquitectura de 200 líneas solo se carga al contexto cuando alguien pregunta sobre arquitectura</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">allowed-tools</div>
+            <div class="glos-def">Campo opcional en el frontmatter de una skill que restringe qué herramientas nativas puede usar Claude mientras esa skill está activa. Útil para crear skills de solo lectura o con guardarraíles de seguridad.</div>
+            <div class="glos-example"><code>allowed-tools: Read, Grep</code> impide que Claude escriba archivos mientras la skill está activa</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">claude doctor</div>
+            <div class="glos-def">Comando de diagnóstico de Claude Code que verifica el estado del entorno de instalación: versión instalada, permisos del sistema, conectividad con la API y configuración activa. Primer paso ante cualquier problema técnico.</div>
+            <div class="glos-example">Si Claude Code no inicia o falla silenciosamente, <code>claude doctor</code> es el primer comando a correr</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Settings Cascade</div>
+            <div class="glos-def">El sistema de resolución de configuración de Claude Code, donde múltiples archivos <code>settings.json</code> se combinan según su nivel (Enterprise → Personal → Project → Plugin), y las reglas más específicas prevalecen sobre las generales.</div>
+            <div class="glos-example">Una regla en <code>.claude/settings.json</code> del proyecto puede sobreescribir la configuración personal del desarrollador</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SKILLS ══ -->
+    <div class="section" id="section-skills">
+      <div class="section-header"><h2>🧩 Skills <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Si te encontrás explicándole lo mismo a Claude repetidamente, eso es una skill esperando ser escrita.</div></div>
+        <p>Una skill es un archivo markdown que le enseña a Claude cómo hacer algo <em>una vez</em>. Claude luego aplica ese conocimiento automáticamente cuando es relevante.</p>
+        <h3>📌 ¿Qué son las Skills?</h3>
+        <p>Las skills son carpetas de instrucciones que Claude Code puede descubrir y usar. Cada skill vive en un archivo <code>SKILL.md</code> con un nombre y descripción en su frontmatter. La descripción es cómo Claude decide si activarla.</p>
+        <pre>---
+name: pr-review
+description: Reviews pull requests for code quality.
+           Use when reviewing PRs or checking code changes.
+---
+# Instrucciones de revisión
+(aquí van tus checklists, preferencias, etc.)</pre>
+        <h3>📁 ¿Dónde viven las Skills?</h3>
+        <table>
+          <thead><tr><th>Tipo</th><th>Ubicación</th><th>Alcance</th></tr></thead>
+          <tbody>
+            <tr><td>✅ Skills personales</td><td><code>~/.claude/skills</code></td><td>Te siguen en todos tus proyectos</td></tr>
+            <tr><td>🏢 Skills de proyecto</td><td><code>.claude/skills</code> (raíz del repo)</td><td>Compartidas con todo el equipo al clonar</td></tr>
+            <tr><td>🪟 Windows (personal)</td><td><code>C:/Users/&lt;usuario&gt;/.claude/skills</code></td><td>Skills personales en Windows</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Las skills de proyecto se <strong>committean al control de versiones</strong> junto con tu código.</div></div>
+        <h3>⚖️ Skills vs. CLAUDE.md vs. Slash Commands</h3>
+        <table>
+          <thead><tr><th>Mecanismo</th><th>Cuándo carga</th><th>Cómo se activa</th><th>Caso de uso ideal</th></tr></thead>
+          <tbody>
+            <tr><td>📄 <strong>CLAUDE.md</strong></td><td>En cada conversación</td><td>Automático siempre</td><td>Reglas globales permanentes</td></tr>
+            <tr><td>🧩 <strong>Skills</strong></td><td>A demanda, cuando coincide</td><td>Automático por contexto</td><td>Conocimiento especializado por tarea</td></tr>
+            <tr><td>⚡ <strong>Slash Commands</strong></td><td>Solo cuando se invoca</td><td>Manual</td><td>Acciones explícitas y repetibles</td></tr>
+          </tbody>
+        </table>
+        <h3>🏆 Prioridad de Skills</h3>
+        <table>
+          <thead><tr><th>Prioridad</th><th>Tipo</th><th>Ubicación</th></tr></thead>
+          <tbody>
+            <tr><td>1 (más alta)</td><td>🏢 Enterprise</td><td>Configuración administrada</td></tr>
+            <tr><td>2</td><td>👤 Personal</td><td><code>~/.claude/skills</code></td></tr>
+            <tr><td>3</td><td>📁 Project</td><td><code>.claude/skills</code></td></tr>
+            <tr><td>4 (más baja)</td><td>🔌 Plugins</td><td>Plugins instalados</td></tr>
+          </tbody>
+        </table>
+        <h3>🔧 Campos de Metadata del Frontmatter</h3>
+        <table>
+          <thead><tr><th>Campo</th><th>Requerido</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>✅ Sí</td><td>Identifica la skill. Solo minúsculas, números y guiones. Máx. 64 caracteres.</td></tr>
+            <tr><td><code>description</code></td><td>✅ Sí</td><td>Le dice a Claude cuándo usar la skill. Máx. 1.024 caracteres.</td></tr>
+            <tr><td><code>allowed-tools</code></td><td>❌ No</td><td>Restringe qué herramientas puede usar Claude cuando la skill está activa.</td></tr>
+            <tr><td><code>model</code></td><td>❌ No</td><td>Especifica qué modelo de Claude usar para esa skill.</td></tr>
+          </tbody>
+        </table>
+        <h3>📂 Divulgación progresiva</h3>
+        <p>Mantené las instrucciones esenciales en <code>SKILL.md</code> y el material de referencia en archivos separados que Claude lee solo cuando lo necesita. Regla de oro: <strong>SKILL.md bajo 500 líneas</strong>.</p>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Si te encontrás explicándole lo mismo a Claude repetidamente, eso es una skill esperando ser escrita.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ AGENTE ══ -->
+    <div class="section" id="section-agente">
+      <div class="section-header"><h2>🤖 Agente <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Un agente no es solo Claude respondiendo preguntas — es Claude ejecutando tareas de forma autónoma, tomando decisiones y usando herramientas para llegar a un resultado concreto.</div></div>
+        <h3>📌 ¿Qué es un Agente?</h3>
+        <p>En Claude Code, un agente es una sesión de Claude que puede invocar herramientas, leer y escribir archivos, ejecutar comandos, y encadenar múltiples acciones para completar una tarea compleja.</p>
+        <h3>🔄 Ciclo de funcionamiento</h3>
+        <ul>
+          <li>🎯 <strong>Recibe una tarea</strong> — del usuario o delegada por otro agente.</li>
+          <li>🗺️ <strong>Planifica</strong> — descompone la tarea en pasos ejecutables.</li>
+          <li>⚙️ <strong>Ejecuta herramientas</strong> — lee archivos, corre comandos, llama APIs.</li>
+          <li>🔍 <strong>Evalúa resultados</strong> — analiza el output de cada acción.</li>
+          <li>🔁 <strong>Itera</strong> — ajusta el plan según lo que encuentra.</li>
+        </ul>
+        <h3>🗂️ Tipos de Agentes</h3>
+        <table>
+          <thead><tr><th>Tipo</th><th>Descripción</th><th>Caso de uso típico</th></tr></thead>
+          <tbody>
+            <tr><td>👤 <strong>Agente principal</strong></td><td>La sesión de Claude con la que interactuás directamente</td><td>Desarrollo interactivo, tareas generales</td></tr>
+            <tr><td>🤖 <strong>Subagente</strong></td><td>Agente lanzado por el principal para trabajo delegado</td><td>Tareas paralelas, contextos aislados</td></tr>
+            <tr><td>🔁 <strong>Agente en loop</strong></td><td>Agente que itera hasta cumplir una condición de salida</td><td>Corrección de errores, refactoring progresivo</td></tr>
+          </tbody>
+        </table>
+        <h3>🛠️ Herramientas disponibles</h3>
+        <table>
+          <thead><tr><th>Herramienta</th><th>Qué hace</th></tr></thead>
+          <tbody>
+            <tr><td><code>Read</code></td><td>Lee el contenido de un archivo</td></tr>
+            <tr><td><code>Write</code></td><td>Escribe o sobreescribe un archivo</td></tr>
+            <tr><td><code>Edit</code></td><td>Modifica partes específicas de un archivo</td></tr>
+            <tr><td><code>Bash</code></td><td>Ejecuta comandos de shell</td></tr>
+            <tr><td><code>Grep</code></td><td>Busca patrones en archivos</td></tr>
+            <tr><td><code>Glob</code></td><td>Lista archivos por patrón</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Un agente con acceso irrestricto a <code>Write</code> y <code>Bash</code> puede modificar cualquier archivo. Definí siempre el alcance mínimo necesario.</div></div>
+        <h3>🧩 Agentes y Skills</h3>
+        <table>
+          <thead><tr><th></th><th>Skills</th><th>Agentes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>¿Qué aportan?</strong></td><td>Conocimiento y procedimientos</td><td>Autonomía y ejecución</td></tr>
+            <tr><td><strong>¿Modifican archivos?</strong></td><td>No directamente</td><td>Sí, a través de herramientas</td></tr>
+            <tr><td><strong>¿Contexto propio?</strong></td><td>No</td><td>Sí</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CLAUDE.md ══ -->
+    <div class="section" id="section-claudemd">
+      <div class="section-header"><h2>📄 CLAUDE.md <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> CLAUDE.md es la memoria persistente de tu proyecto. Todo lo que escribís ahí, Claude lo sabe desde el primer mensaje de cada conversación.</div></div>
+        <h3>📁 Dónde colocar CLAUDE.md</h3>
+        <table>
+          <thead><tr><th>Ubicación</th><th>Alcance</th><th>Cuándo usarlo</th></tr></thead>
+          <tbody>
+            <tr><td><code>./CLAUDE.md</code></td><td>Todo el proyecto</td><td>Estándares generales del proyecto</td></tr>
+            <tr><td><code>~/.claude/CLAUDE.md</code></td><td>Todos tus proyectos</td><td>Preferencias personales globales</td></tr>
+            <tr><td><code>./src/CLAUDE.md</code></td><td>Solo ese subdirectorio</td><td>Instrucciones específicas por módulo</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Claude carga todos los <code>CLAUDE.md</code> relevantes en cascada. Las instrucciones más específicas tienen precedencia.</div></div>
+        <h3>✍️ ¿Qué poner en CLAUDE.md?</h3>
+        <ul>
+          <li>🏗️ <strong>Arquitectura del proyecto</strong></li>
+          <li>📐 <strong>Estándares de código</strong> — estilo, naming conventions, linters</li>
+          <li>🚫 <strong>Restricciones explícitas</strong></li>
+          <li>🛠️ <strong>Stack y comandos frecuentes</strong></li>
+          <li>🔗 <strong>Contexto de negocio</strong> — glosario del dominio</li>
+        </ul>
+        <h3>🏗️ Estructura recomendada</h3>
+        <pre># Nombre del Proyecto
+
+## Descripción
+## Stack técnico
+## Convenciones de código
+## Restricciones importantes
+## Comandos frecuentes</pre>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>CLAUDE.md carga en <strong>cada conversación</strong>. Mantenelo conciso — el material extenso va mejor en skills.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ HOOKS ══ -->
+    <div class="section" id="section-hooks">
+      <div class="section-header"><h2>🪝 Hooks <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Los hooks son automatizaciones event-driven — se disparan solos cuando Claude hace algo, sin que vos lo pidás.</div></div>
+        <h3>🔔 Tipos de eventos</h3>
+        <table>
+          <thead><tr><th>Evento</th><th>Cuándo se dispara</th><th>Caso de uso típico</th></tr></thead>
+          <tbody>
+            <tr><td><code>PostToolUse</code></td><td>Después de que Claude usa una herramienta</td><td>Correr linter tras escribir un archivo</td></tr>
+            <tr><td><code>PreToolUse</code></td><td>Antes de que Claude use una herramienta</td><td>Validar parámetros antes de Bash</td></tr>
+            <tr><td><code>Notification</code></td><td>Cuando Claude envía una notificación</td><td>Logging, alertas externas</td></tr>
+            <tr><td><code>Stop</code></td><td>Cuando Claude termina de responder</td><td>Limpieza, reportes post-tarea</td></tr>
+          </tbody>
+        </table>
+        <h3>🏗️ Estructura en settings.json</h3>
+        <pre>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "npm run lint" }]
+      }
+    ]
+  }
+}</pre>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Los hooks corren comandos reales. Probálos en entornos seguros antes de usarlos en producción.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ MCP ══ -->
+    <div class="section" id="section-mcp">
+      <div class="section-header"><h2>🔌 MCP Servers <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> MCP (Model Context Protocol) permite a Claude conectarse con herramientas y servicios externos — bases de datos, APIs, servicios cloud.</div></div>
+        <h3>🧱 Componentes de MCP</h3>
+        <table>
+          <thead><tr><th>Componente</th><th>Qué es</th><th>Ejemplo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Tools</strong></td><td>Funciones que Claude puede invocar</td><td><code>query_database(sql)</code></td></tr>
+            <tr><td><strong>Resources</strong></td><td>Datos que Claude puede leer</td><td>Archivos remotos, registros de DB</td></tr>
+            <tr><td><strong>Prompts</strong></td><td>Templates predefinidos</td><td>Plantillas de análisis</td></tr>
+          </tbody>
+        </table>
+        <h3>⚙️ Configuración</h3>
+        <pre>{
+  "mcpServers": {
+    "mi-db": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": { "POSTGRES_URL": "postgresql://localhost/mibase" }
+    }
+  }
+}</pre>
+        <h3>🔌 Servers populares</h3>
+        <table>
+          <thead><tr><th>Server</th><th>Qué provee</th></tr></thead>
+          <tbody>
+            <tr><td><code>server-postgres</code></td><td>Acceso a PostgreSQL</td></tr>
+            <tr><td><code>server-github</code></td><td>API de GitHub</td></tr>
+            <tr><td><code>server-slack</code></td><td>API de Slack</td></tr>
+            <tr><td><code>server-brave-search</code></td><td>Búsqueda web</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Revisá siempre los permisos antes de conectar Claude a APIs o bases de datos de producción.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ SLASH COMMANDS ══ -->
+    <div class="section" id="section-slash">
+      <div class="section-header"><h2>⚡ Slash Commands <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Si las skills son el piloto automático, los slash commands son el joystick manual. Los controlás vos, cuando querés.</div></div>
+        <h3>📁 Dónde viven</h3>
+        <table>
+          <thead><tr><th>Tipo</th><th>Ubicación</th><th>Alcance</th></tr></thead>
+          <tbody>
+            <tr><td>👤 Personales</td><td><code>~/.claude/commands/</code></td><td>Todos tus proyectos</td></tr>
+            <tr><td>🏢 De proyecto</td><td><code>.claude/commands/</code></td><td>Compartidos con el equipo</td></tr>
+          </tbody>
+        </table>
+        <h3>🛠️ Ejemplo</h3>
+        <pre># ~/.claude/commands/daily-standup.md
+
+Generá un resumen de standup diario basado en:
+1. Los commits de las últimas 24 horas
+2. Los archivos modificados
+3. Cualquier TODO o FIXME nuevo
+
+## ✅ Qué hice ayer
+## 🎯 Qué voy a hacer hoy
+## 🚧 Bloqueos o dudas</pre>
+        <pre>/daily-standup</pre>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Usá <code>$ARGUMENTS</code> para pasar parámetros: <code>/review feature/login</code> donde <code>$ARGUMENTS</code> captura <code>feature/login</code>.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ CLI CHEAT SHEET ══ -->
+    <div class="section" id="section-cheatsheet">
+      <div class="section-header"><h2>📋 CLI Cheat Sheet <span class="badge">Referencia rápida</span></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Comandos reales de la CLI de Claude Code — los que aparecen al tipear <code>/</code> o al iniciar una sesión en la terminal.</div></div>
+        <h3>🚀 Comandos de inicio</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">claude</span></td><td class="cli-desc">Inicia sesión interactiva en el directorio actual</td></tr>
+          <tr><td><span class="cli-cmd">claude "tarea"</span></td><td class="cli-desc">Ejecuta tarea en modo no interactivo</td></tr>
+          <tr><td><span class="cli-cmd">claude -p "prompt"</span></td><td class="cli-desc">Envía prompt directo sin sesión interactiva</td></tr>
+          <tr><td><span class="cli-cmd">claude --continue</span></td><td class="cli-desc">Retoma la conversación más reciente</td></tr>
+          <tr><td><span class="cli-cmd">claude --resume</span></td><td class="cli-desc">Lista conversaciones anteriores para retomar</td></tr>
+          <tr><td><span class="cli-cmd">claude --model &lt;id&gt;</span></td><td class="cli-desc">Especifica el modelo a usar</td></tr>
+        </table>
+        <h3>⚡ Slash commands del sistema</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">/help</span></td><td class="cli-desc">Muestra todos los comandos disponibles</td></tr>
+          <tr><td><span class="cli-cmd">/clear</span></td><td class="cli-desc">Limpia el historial sin cerrar la sesión</td></tr>
+          <tr><td><span class="cli-cmd">/compact</span></td><td class="cli-desc">Comprime el contexto para liberar espacio</td></tr>
+          <tr><td><span class="cli-cmd">/status</span></td><td class="cli-desc">Modelo activo, uso de contexto y skills cargadas</td></tr>
+          <tr><td><span class="cli-cmd">/model &lt;id&gt;</span></td><td class="cli-desc">Cambia el modelo durante la sesión</td></tr>
+          <tr><td><span class="cli-cmd">/skills</span></td><td class="cli-desc">Lista todas las skills disponibles</td></tr>
+          <tr><td><span class="cli-cmd">/mcp</span></td><td class="cli-desc">Lista servidores MCP y su estado</td></tr>
+          <tr><td><span class="cli-cmd">/exit</span></td><td class="cli-desc">Cierra la sesión</td></tr>
+        </table>
+        <h3>📋 Flags globales útiles</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">--allowedTools</span></td><td class="cli-desc">Lista blanca de herramientas permitidas</td></tr>
+          <tr><td><span class="cli-cmd">--disallowedTools</span></td><td class="cli-desc">Herramientas explícitamente bloqueadas</td></tr>
+          <tr><td><span class="cli-cmd">--output-format</span></td><td class="cli-desc">Formato: <code>text</code>, <code>json</code>, <code>stream-json</code></td></tr>
+          <tr><td><span class="cli-cmd">--max-turns &lt;n&gt;</span></td><td class="cli-desc">Límite de turnos en modo agente</td></tr>
+          <tr><td><span class="cli-cmd">--verbose</span></td><td class="cli-desc">Muestra razonamiento interno y llamadas a herramientas</td></tr>
+          <tr><td><span class="cli-cmd">--dangerously-skip-permissions</span></td><td class="cli-desc">⚠️ Omite confirmaciones — solo entornos automatizados</td></tr>
+        </table>
+        <h3>📁 Configuración</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">claude config list</span></td><td class="cli-desc">Muestra la configuración activa</td></tr>
+          <tr><td><span class="cli-cmd">claude config get &lt;key&gt;</span></td><td class="cli-desc">Valor de una clave específica</td></tr>
+          <tr><td><span class="cli-cmd">claude config set &lt;key&gt; &lt;val&gt;</span></td><td class="cli-desc">Establece un valor de configuración</td></tr>
+          <tr><td><span class="cli-cmd">claude doctor</span></td><td class="cli-desc">Diagnóstico del entorno</td></tr>
+          <tr><td><span class="cli-cmd">claude update</span></td><td class="cli-desc">Actualiza Claude Code a la última versión</td></tr>
+        </table>
+        <h3>📊 Tabla de decisión rápida</h3>
+        <table>
+          <thead><tr><th>¿Qué necesitás?</th><th>Usá</th></tr></thead>
+          <tbody>
+            <tr><td>Que Claude siempre sepa X</td><td>📄 CLAUDE.md</td></tr>
+            <tr><td>Que Claude sepa X solo cuando es relevante</td><td>🧩 Skill</td></tr>
+            <tr><td>Ejecutar una acción cuando vos lo decidís</td><td>⚡ Slash Command</td></tr>
+            <tr><td>Automatizar algo cuando Claude hace Y</td><td>🪝 Hook</td></tr>
+            <tr><td>Conectar con una API o servicio externo</td><td>🔌 MCP Server</td></tr>
+            <tr><td>Delegar trabajo complejo a contexto aislado</td><td>🤖 Subagente</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ DIRECTORIOS ══ -->
+    <div class="section" id="section-directorios">
+      <div class="section-header"><h2>📁 Directorios <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Estructura de directorios de Claude Code: dónde vive cada archivo, qué alcance tiene y ejemplos reales.</div></div>
+        <h3>🏠 Configuración personal (global)</h3>
+        <pre class="dir-tree"><span class="dir">~/.claude/</span>
+├── <span class="file">CLAUDE.md</span>             <span class="note"># Instrucciones personales globales</span>
+├── <span class="file">settings.json</span>         <span class="note"># Configuración global (hooks, MCP, permisos)</span>
+├── <span class="dir">skills/</span>
+│   ├── <span class="dir">commit-message/</span>
+│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Skill personal: formato de commits</span>
+│   ├── <span class="dir">code-explain/</span>
+│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Skill personal: cómo explicar código</span>
+│   └── <span class="dir">debug-helper/</span>
+│       ├── <span class="file">SKILL.md</span>
+│       └── <span class="dir">references/</span>
+│           └── <span class="file">checklist.md</span>
+└── <span class="dir">commands/</span>
+    ├── <span class="file">standup.md</span>            <span class="note"># /standup</span>
+    └── <span class="file">changelog.md</span>          <span class="note"># /changelog</span></pre>
+        <h3>🏢 Configuración de proyecto</h3>
+        <pre class="dir-tree"><span class="dir">mi-proyecto/</span>
+├── <span class="file">CLAUDE.md</span>                  <span class="note"># Instrucciones del proyecto</span>
+├── <span class="dir">.claude/</span>
+│   ├── <span class="file">settings.json</span>          <span class="note"># Hooks y MCP del proyecto</span>
+│   ├── <span class="dir">skills/</span>
+│   │   ├── <span class="dir">pr-review/</span>
+│   │   │   ├── <span class="file">SKILL.md</span>
+│   │   │   └── <span class="dir">references/</span>
+│   │   │       └── <span class="file">review-guide.md</span>
+│   │   └── <span class="dir">api-design/</span>
+│   │       ├── <span class="file">SKILL.md</span>
+│   │       └── <span class="dir">scripts/</span>
+│   │           └── <span class="file">validate-openapi.sh</span>
+│   └── <span class="dir">commands/</span>
+│       ├── <span class="file">release.md</span>
+│       └── <span class="file">audit.md</span>
+└── <span class="dir">src/</span>
+    ├── <span class="file">CLAUDE.md</span>              <span class="note"># Instrucciones del módulo src/</span>
+    └── <span class="note">...</span></pre>
+        <h3>⚙️ Anatomía de settings.json</h3>
+        <pre>{
+  "permissions": {
+    "allow": ["Read", "Bash(git *)", "Bash(npm run *)"],
+    "deny":  ["Bash(rm -rf *)"]
+  },
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "npm run lint" }] }
+    ]
+  },
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "ghp_..." }
+    }
+  }
+}</pre>
+        <h3>📐 Precedencia</h3>
+        <table>
+          <thead><tr><th>Nivel</th><th>Archivo</th><th>Prevalece sobre…</th></tr></thead>
+          <tbody>
+            <tr><td>🏢 Enterprise</td><td>Configuración central</td><td>Todo</td></tr>
+            <tr><td>👤 Personal</td><td><code>~/.claude/settings.json</code></td><td>Proyecto y plugins</td></tr>
+            <tr><td>📁 Proyecto</td><td><code>.claude/settings.json</code></td><td>Plugins</td></tr>
+            <tr><td>🔌 Plugins</td><td>Plugin system</td><td>Nada</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ IMPLEMENTACIÓN ══ -->
+    <div class="section" id="section-impl">
+      <div class="section-header"><h2>🚀 Implementación Completa <span class="badge">Ejemplo integrador</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Escenario:</strong> API de e-commerce en <strong>.NET 8 + EF Core + SQL Server</strong>. El equipo necesita refactorizar el módulo de órdenes, mantener cobertura de tests y un proceso de revisión de código consistente.</div></div>
+        <h3>📁 Estructura del proyecto</h3>
+        <pre class="dir-tree"><span class="dir">ecommerce-api/</span>
+├── <span class="file">CLAUDE.md</span>                        <span class="note"># Stack, convenciones, restricciones .NET</span>
+├── <span class="dir">.claude/</span>
+│   ├── <span class="file">settings.json</span>                <span class="note"># Hooks + MCP Server</span>
+│   ├── <span class="dir">skills/</span>
+│   │   ├── <span class="dir">refactor-dotnet/</span>
+│   │   │   ├── <span class="file">SKILL.md</span>
+│   │   │   └── <span class="dir">references/</span>
+│   │   │       └── <span class="file">patterns.md</span>      <span class="note"># CQRS, Repository, Result&lt;T&gt;</span>
+│   │   ├── <span class="dir">test-writer/</span>
+│   │   │   ├── <span class="file">SKILL.md</span>
+│   │   │   └── <span class="dir">references/</span>
+│   │   │       └── <span class="file">test-examples.md</span>
+│   │   └── <span class="dir">pr-review/</span>
+│   │       └── <span class="file">SKILL.md</span>
+│   └── <span class="dir">commands/</span>
+│       └── <span class="file">coverage-report.md</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="dir">EcommerceApi/</span>
+│   ├── <span class="dir">EcommerceApi.Application/</span>
+│   ├── <span class="dir">EcommerceApi.Domain/</span>
+│   └── <span class="dir">EcommerceApi.Infrastructure/</span>
+└── <span class="dir">tests/</span>
+    ├── <span class="dir">EcommerceApi.UnitTests/</span>
+    └── <span class="dir">EcommerceApi.IntegrationTests/</span></pre>
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>📄 CLAUDE.md — contexto permanente</h4>
+          <pre># EcommerceApi
+
+## Stack
+- .NET 8 · ASP.NET Core Minimal APIs
+- Entity Framework Core 8 · SQL Server 2022
+- xUnit · Moq · FluentAssertions
+
+## Convenciones
+- Usar record types para DTOs y Value Objects
+- Métodos async terminan en Async
+- Nunca retornar null: usar Result&lt;T&gt;
+- EF Core: AsNoTracking() en queries de solo lectura
+
+## Restricciones
+- Nunca modificar migraciones existentes
+- No usar DbContext en Controllers — solo en Repositories
+- No hardcodear connection strings
+
+## Comandos
+- `dotnet build`
+- `dotnet test --filter Category=Unit`
+- `dotnet ef migrations add &lt;Nombre&gt;`
+- `dotnet format`</pre>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>🧩 Skill: refactor-dotnet</h4>
+          <pre>---
+name: refactor-dotnet
+description: Refactoriza código C# / .NET 8. Usar cuando se pida
+             refactorizar, mejorar o modernizar clases, servicios
+             o repositorios C#.
+---
+1. Leé el archivo completo antes de modificar
+2. Aplicar: CQRS, Result&lt;T&gt;, record DTOs, primary constructors
+3. EF Core: AsNoTracking() en queries, transacciones en writes
+4. Al terminar: `dotnet build` y listar cambios realizados
+5. Indicar qué tests nuevos hacen falta</pre>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>🧩 Skill: test-writer</h4>
+          <pre>---
+name: test-writer
+description: Escribe tests unitarios e integración .NET.
+             Usar cuando se pida crear tests, agregar cobertura
+             o testear un método, clase o endpoint.
+---
+- Framework: xUnit · Moq (MockBehavior.Strict) · FluentAssertions
+- Nomenclatura: Método_Escenario_Resultado
+- Estructura: Arrange / Act / Assert siempre
+- Cubrir: happy path, input inválido, not found, infra error</pre>
+        </div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <h4>🪝 Hook: build automático tras cada cambio</h4>
+          <pre>{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{
+        "type": "command",
+        "command": "dotnet format --verify-no-changes 2>&1 | tail -3 && dotnet build --no-restore -q 2>&1 | tail -5"
+      }]
+    }]
+  }
+}</pre>
+        </div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body">
+          <h4>🔌 MCP + ⚡ /coverage-report</h4>
+          <pre>// MCP: SQL Server staging (readonly)
+"mcpServers": {
+  "staging-db": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-mssql"],
+    "env": { "MSSQL_CONNECTION_STRING": "Server=staging;..." }
+  }
+}
+
+// /coverage-report
+dotnet test --collect:"XPlat Code Coverage"
+→ Reportar clases bajo 80% y sugerir casos faltantes</pre>
+        </div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body">
+          <h4>🎯 El flujo en acción</h4>
+          <pre>$ claude
+> "refactorizá OrderService.cs"
+# ✦ Skill refactor-dotnet activa → CQRS + Result&lt;T&gt; + records
+# ✦ Hook → dotnet format + build automático ✅
+
+> "escribí tests para CreateOrderCommandHandler"
+# ✦ Skill test-writer activa → xUnit + Moq + 4 casos cubiertos
+# ✦ Hook → build pasa ✅
+
+> /coverage-report EcommerceApi.Application
+# ✦ Application layer al 91% · 2 métodos bajo 80% identificados
+
+> "revisá la rama feature/refactor-orders"
+# ✦ Skill pr-review activa → checklist .NET/EF Core
+# ✦ Resultado: ✅ Aprobado con 1 sugerencia menor</pre>
+        </div></div>
+        <div class="callout ok"><span class="callout-icon">✅</span><div>
+          <strong>Cada pieza en su rol:</strong> CLAUDE.md da contexto siempre · Skills aplican expertise automáticamente · Hook verifica compilación sin intervención · MCP conecta a staging · Slash command genera reportes on demand.
+        </div></div>
+      </div>
+    </div>
+
+    <!-- ══ TROUBLESHOOTING ══ -->
+    <div class="section" id="section-troubleshoot">
+      <div class="section-header"><h2>🔧 Troubleshooting <span class="badge">Errores comunes</span></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Los problemas más frecuentes al trabajar con Claude Code, organizados por síntoma. Hacé clic en cada uno para ver la causa y solución.</div></div>
+
+        <h3>🧩 Skills</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            Mi skill no se activa cuando la pido <span class="trouble-tag tag-skill">Skill</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> Claude no activa la skill aunque el pedido parece relevante.</div></div>
+            <p><strong>Causas y soluciones:</strong></p>
+            <ul>
+              <li>🔄 <strong>No reiniciaste Claude Code</strong> después de crear o editar la skill. Las skills cargan al inicio — siempre reiniciá la sesión tras cambios.</li>
+              <li>📝 <strong>La descripción es muy vaga.</strong> Si dice solo "ayuda con código", Claude no sabe cuándo usarla. Agregá ejemplos concretos de frases que la activan: <em>"Use when reviewing PRs, checking code before merge, or when asked for feedback on a branch."</em></li>
+              <li>📁 <strong>El archivo está mal ubicado.</strong> La estructura debe ser <code>.claude/skills/nombre-skill/SKILL.md</code> — no <code>.claude/skills/SKILL.md</code> directamente.</li>
+              <li>✏️ <strong>El frontmatter tiene errores.</strong> Los campos <code>name</code> y <code>description</code> son obligatorios y deben estar entre los dashes <code>---</code>.</li>
+            </ul>
+            <p><strong>Verificación rápida:</strong></p>
+            <pre>/skills list</pre>
+            <p>Si tu skill no aparece en la lista, el problema es de ubicación o frontmatter.</p>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            Se activa la skill incorrecta cuando tengo dos con nombres similares <span class="trouble-tag tag-skill">Skill</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> Claude activa la skill del proyecto en vez de la personal, o viceversa.</div></div>
+            <p>El orden de prioridad es: <strong>Enterprise → Personal → Project → Plugins</strong>. Si tenés dos skills con el mismo <code>name</code>, gana la de mayor prioridad.</p>
+            <ul>
+              <li>Usá nombres descriptivos para evitar colisiones: <code>frontend-review</code> en vez de <code>review</code>.</li>
+              <li>Si querés que la de proyecto sobreescriba la personal, la única opción es renombrar la personal.</li>
+              <li>Usá <code>/skills list</code> para ver el origen (personal/proyecto) de cada skill activa.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            La skill carga pero Claude no sigue las instrucciones correctamente <span class="trouble-tag tag-skill">Skill</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> Claude confirma que activó la skill pero el resultado no respeta el formato o los pasos definidos.</div></div>
+            <ul>
+              <li>📏 <strong>SKILL.md es demasiado largo.</strong> Si supera las 500 líneas, Claude puede omitir partes. Mové el material extenso a archivos en <code>references/</code> y referencialos desde el SKILL.md.</li>
+              <li>⚔️ <strong>Conflicto con CLAUDE.md.</strong> Si CLAUDE.md tiene instrucciones que contradicen la skill, CLAUDE.md puede ganar por estar siempre en contexto. Revisá que no haya solapamiento.</li>
+              <li>🔢 <strong>Instrucciones ambiguas.</strong> Los pasos numerados y las listas con viñetas funcionan mejor que los párrafos largos para instrucciones procedurales.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>🪝 Hooks</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            El hook no se ejecuta después de que Claude edita un archivo <span class="trouble-tag tag-hook">Hook</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> Claude escribe o edita archivos pero el hook no dispara.</div></div>
+            <ul>
+              <li>🔄 <strong>Reiniciá Claude Code.</strong> Los hooks se leen al iniciar la sesión.</li>
+              <li>📄 <strong>Verificá el JSON.</strong> Un error de sintaxis en <code>settings.json</code> silencia todos los hooks. Validá con <code>claude config list</code>.</li>
+              <li>🎯 <strong>Revisá el matcher.</strong> <code>"matcher": "Write"</code> solo activa en writes. Para edits también, usá <code>"matcher": "Write|Edit"</code>.</li>
+              <li>📁 <strong>Ubicación del settings.json.</strong> Debe estar en <code>.claude/settings.json</code> (proyecto) o <code>~/.claude/settings.json</code> (global).</li>
+            </ul>
+            <pre>// Verificar configuración activa
+claude config list</pre>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            El hook falla con "command not found" o errores de path <span class="trouble-tag tag-hook">Hook</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> El hook dispara pero el comando no se encuentra o falla con error de ruta.</div></div>
+            <ul>
+              <li>🛣️ <strong>Los hooks corren con el PATH del sistema, no del shell interactivo.</strong> Usá rutas absolutas o verificá que el comando esté en el PATH del sistema.</li>
+              <li>📦 <strong>El comando requiere contexto del proyecto.</strong> Usá <code>cd /ruta/al/proyecto && npm run lint</code> si el comando necesita estar en un directorio específico.</li>
+              <li>🔑 <strong>Permisos de ejecución.</strong> Si el hook llama a un script, verificá que tenga permisos: <code>chmod +x script.sh</code>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>🔌 MCP</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            El MCP server aparece como desconectado <span class="trouble-tag tag-mcp">MCP</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> <code>/mcp</code> muestra el server como offline o Claude dice que no puede conectarse.</div></div>
+            <ul>
+              <li>📦 <strong>El paquete no está instalado.</strong> Con <code>npx -y</code> se instala automáticamente, pero puede fallar en redes corporativas. Intentá instalarlo manualmente: <code>npm install -g @modelcontextprotocol/server-postgres</code>.</li>
+              <li>🔑 <strong>Variables de entorno faltantes.</strong> Verificá que las variables en el bloque <code>env</code> estén definidas y sean correctas.</li>
+              <li>🔒 <strong>Problema de conectividad.</strong> Si la DB o API es remota, verificá que el host sea accesible desde tu máquina con un ping o telnet.</li>
+              <li>📋 <strong>Revisá los logs del server:</strong></li>
+            </ul>
+            <pre>claude --verbose</pre>
+            <p>En modo verbose verás los errores de inicialización del MCP server.</p>
+          </div>
+        </div>
+
+        <h3>📄 CLAUDE.md / General</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            Claude ignora las instrucciones de CLAUDE.md <span class="trouble-tag tag-claude">CLAUDE.md</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> Claude no respeta convenciones o restricciones definidas en CLAUDE.md.</div></div>
+            <ul>
+              <li>📏 <strong>CLAUDE.md es demasiado largo.</strong> Si tiene cientos de líneas, las instrucciones al final pueden quedar fuera del foco. Priorizar y condensar.</li>
+              <li>⚔️ <strong>Instrucción contradictoria en el chat.</strong> Si el usuario da una instrucción contraria a CLAUDE.md en el mismo mensaje, puede prevalecer. CLAUDE.md establece defaults, no reglas absolutas.</li>
+              <li>📁 <strong>Archivo mal nombrado.</strong> Debe ser exactamente <code>CLAUDE.md</code> (mayúsculas) en la raíz del proyecto o en el directorio home.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            El contexto se llena rápido y Claude empieza a "olvidar" cosas <span class="trouble-tag tag-gen">General</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Síntoma:</strong> En sesiones largas, Claude empieza a ignorar instrucciones o perder el hilo de la tarea.</div></div>
+            <ul>
+              <li>🗜️ <strong>Usá <code>/compact</code></strong> para comprimir el historial de la conversación sin perder el contexto esencial.</li>
+              <li>📂 <strong>Mové contenido de CLAUDE.md a skills.</strong> Lo que no necesita estar siempre presente consume contexto innecesariamente.</li>
+              <li>✂️ <strong>Dividí tareas largas.</strong> En vez de una sesión gigante, usá subagentes o sesiones separadas para módulos distintos.</li>
+              <li>🔄 <strong>Iniciá una sesión nueva</strong> con <code>claude --continue</code> para retomar el contexto resumido en vez de acumularlo indefinidamente.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ GLOSARIO ══ -->
+    <div class="section" id="section-glosario">
+      <div class="section-header"><h2>📖 Glosario <span class="badge">Términos clave</span></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Definiciones de los términos técnicos usados en esta documentación y en el ecosistema Claude Code.</div></div>
+
+        <div class="glosario-grid">
+          <div class="glos-card">
+            <div class="glos-term">Frontmatter</div>
+            <div class="glos-def">Bloque de metadatos al inicio de un archivo Markdown, delimitado por <code>---</code>. En Claude Code se usa para definir el <code>name</code> y <code>description</code> de skills y comandos.</div>
+            <div class="glos-example">Ejemplo: el bloque <code>---name: pr-review---</code> al inicio de un SKILL.md</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Context Window</div>
+            <div class="glos-def">La cantidad máxima de texto (tokens) que Claude puede "ver" a la vez en una conversación. CLAUDE.md, skills activas, historial del chat y archivos leídos compiten por este espacio.</div>
+            <div class="glos-example">Si el contexto se llena, Claude puede "olvidar" instrucciones anteriores</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Semantic Matching</div>
+            <div class="glos-def">El mecanismo por el cual Claude compara tu solicitud con las descripciones de las skills disponibles para decidir cuál activar. No busca palabras exactas sino intención y significado.</div>
+            <div class="glos-example">"revisá el PR" activa una skill descrita como "reviews code changes before merge"</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Subagente</div>
+            <div class="glos-def">Instancia de Claude lanzada por el agente principal para ejecutar una tarea delegada en un contexto aislado. Recibe instrucciones, trabaja de forma independiente y devuelve resultados.</div>
+            <div class="glos-example">El agente principal delega "escribir los tests" a un subagente mientras continúa con otra tarea</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">MCP (Model Context Protocol)</div>
+            <div class="glos-def">Protocolo abierto estándar que define cómo los modelos de lenguaje se comunican con herramientas externas. Permite a Claude conectarse a bases de datos, APIs y servicios sin código personalizado.</div>
+            <div class="glos-example">Un MCP server de PostgreSQL permite a Claude ejecutar queries SQL directamente</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Event-driven</div>
+            <div class="glos-def">Paradigma en el que una acción se dispara automáticamente en respuesta a un evento, sin intervención manual. En Claude Code, los hooks son event-driven: se ejecutan cuando Claude usa una herramienta.</div>
+            <div class="glos-example">El evento "Claude guardó un archivo" dispara automáticamente el hook de linting</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Progressive Disclosure</div>
+            <div class="glos-def">Técnica de organización donde solo se carga el contenido esencial inicialmente, y el detalle adicional se incorpora bajo demanda. Aplicado a skills: SKILL.md tiene lo esencial, <code>references/</code> tiene el detalle.</div>
+            <div class="glos-example">La guía de arquitectura solo se carga cuando alguien pregunta sobre arquitectura</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Execution Context</div>
+            <div class="glos-def">El entorno aislado en el que opera un agente o subagente: qué herramientas tiene disponibles, qué instrucciones recibió y cuál es el estado de su conversación. Cada subagente tiene el suyo propio.</div>
+            <div class="glos-example">El subagente de tests no "ve" la conversación del agente principal</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Token</div>
+            <div class="glos-def">Unidad básica de procesamiento de texto para los modelos de lenguaje. Aproximadamente 4 caracteres en inglés o 3 en español. El context window se mide en tokens.</div>
+            <div class="glos-example">Un CLAUDE.md de 2.000 palabras consume ~2.700 tokens del contexto en cada conversación</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Matcher</div>
+            <div class="glos-def">Patrón en la configuración de hooks que define qué herramienta o evento debe ocurrir para que el hook se dispare. Soporta nombres exactos y expresiones con <code>|</code>.</div>
+            <div class="glos-example"><code>"matcher": "Write|Edit"</code> activa el hook cuando Claude escribe o edita archivos</div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">Result&lt;T&gt;</div>
+            <div class="glos-def">Patrón de diseño (común en .NET, Rust, F#) que representa el resultado de una operación que puede fallar, sin usar excepciones para control de flujo. Retorna éxito con valor o error con detalle.</div>
+            <div class="glos-example"><code>Result&lt;Order&gt;</code> puede ser <code>Ok(order)</code> o <code>Fail("Cliente no encontrado")</code></div>
+          </div>
+          <div class="glos-card">
+            <div class="glos-term">CQRS</div>
+            <div class="glos-def">Command Query Responsibility Segregation. Patrón arquitectónico que separa las operaciones de lectura (Queries) de las de escritura (Commands) en clases o flujos distintos.</div>
+            <div class="glos-example"><code>CreateOrderCommandHandler</code> escribe · <code>GetOrderQueryHandler</code> lee</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ QUIZ ══ -->
+    <div class="section" id="section-quiz">
+      <div class="section-header"><h2>🎯 Quiz <span class="badge">Poné a prueba lo que aprendiste</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div>10 preguntas sobre todo lo que cubre esta documentación. Sin trampa, sin curva de aprendizaje — si leíste, sabés. Si no leíste... bueno, los resultados van a hablar por vos.</div></div>
+
+        <div class="quiz-wrap" id="quiz-wrap">
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">1. ¿Cuál es la diferencia principal entre una Skill y CLAUDE.md?</div>
+            <div class="quiz-option" data-val="a">A) CLAUDE.md es para proyectos, las skills son personales</div>
+            <div class="quiz-option" data-val="b">B) CLAUDE.md carga siempre; las skills cargan solo cuando el contexto coincide</div>
+            <div class="quiz-option" data-val="c">C) Las skills son más rápidas que CLAUDE.md</div>
+            <div class="quiz-option" data-val="d">D) No hay diferencia, son lo mismo con distinto nombre</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">2. ¿Dónde debe estar ubicado el archivo de una skill de proyecto para que el equipo la comparta?</div>
+            <div class="quiz-option" data-val="a">A) <code>~/.claude/skills/nombre/SKILL.md</code></div>
+            <div class="quiz-option" data-val="b">B) <code>./skills/nombre/SKILL.md</code></div>
+            <div class="quiz-option" data-val="c">C) <code>.claude/skills/nombre/SKILL.md</code></div>
+            <div class="quiz-option" data-val="d">D) <code>./SKILL.md</code> en la raíz del proyecto</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="a">
+            <div class="q-text">3. Si tenés una skill personal y una skill de proyecto con el mismo nombre, ¿cuál gana?</div>
+            <div class="quiz-option" data-val="a">A) La personal, porque tiene mayor prioridad que la de proyecto</div>
+            <div class="quiz-option" data-val="b">B) La de proyecto, porque está más cerca del código</div>
+            <div class="quiz-option" data-val="c">C) La que se creó primero</div>
+            <div class="quiz-option" data-val="d">D) Se activan las dos al mismo tiempo</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="d">
+            <div class="q-text">4. ¿Para qué sirve el campo <code>allowed-tools</code> en el frontmatter de una skill?</div>
+            <div class="quiz-option" data-val="a">A) Define qué comandos slash puede usar el usuario mientras la skill está activa</div>
+            <div class="quiz-option" data-val="b">B) Lista los MCP servers permitidos durante la skill</div>
+            <div class="quiz-option" data-val="c">C) Especifica en qué proyectos puede usarse la skill</div>
+            <div class="quiz-option" data-val="d">D) Restringe qué herramientas puede usar Claude cuando la skill está activa</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">5. Querés que cada vez que Claude edite un archivo .cs, se ejecute <code>dotnet build</code> automáticamente. ¿Qué usás?</div>
+            <div class="quiz-option" data-val="a">A) Un slash command <code>/build</code> que el equipo invoca manualmente</div>
+            <div class="quiz-option" data-val="b">B) Un hook <code>PostToolUse</code> con matcher <code>Write|Edit</code></div>
+            <div class="quiz-option" data-val="c">C) Una skill que incluye el paso de build en sus instrucciones</div>
+            <div class="quiz-option" data-val="d">D) Una entrada en CLAUDE.md que le pide a Claude que siempre haga build</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">6. ¿Qué hace el comando <code>/compact</code> dentro de una sesión de Claude Code?</div>
+            <div class="quiz-option" data-val="a">A) Comprime los archivos del proyecto para que ocupen menos espacio</div>
+            <div class="quiz-option" data-val="b">B) Elimina todas las skills cargadas para liberar memoria</div>
+            <div class="quiz-option" data-val="c">C) Comprime el historial de la conversación para liberar espacio en el contexto</div>
+            <div class="quiz-option" data-val="d">D) Combina múltiples CLAUDE.md en uno solo</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="a">
+            <div class="q-text">7. ¿Cuál es la diferencia entre un Agente y un Subagente en Claude Code?</div>
+            <div class="quiz-option" data-val="a">A) El subagente corre en un contexto aislado y recibe trabajo delegado del agente principal</div>
+            <div class="quiz-option" data-val="b">B) El subagente es más pequeño y usa menos tokens</div>
+            <div class="quiz-option" data-val="c">C) No hay diferencia, son sinónimos</div>
+            <div class="quiz-option" data-val="d">D) El subagente solo puede leer archivos, nunca escribirlos</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="d">
+            <div class="q-text">8. En MCP, ¿qué son los "Tools"?</div>
+            <div class="quiz-option" data-val="a">A) Las herramientas nativas de Claude Code como Read, Write y Bash</div>
+            <div class="quiz-option" data-val="b">B) Los archivos de configuración del servidor MCP</div>
+            <div class="quiz-option" data-val="c">C) Los scripts en la carpeta <code>scripts/</code> de una skill</div>
+            <div class="quiz-option" data-val="d">D) Funciones que expone el servidor MCP y que Claude puede invocar</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">9. ¿Para qué tipo de tarea es más adecuado un slash command vs una skill?</div>
+            <div class="quiz-option" data-val="a">A) El slash command es mejor para tareas que requieren razonamiento complejo</div>
+            <div class="quiz-option" data-val="b">B) El slash command es mejor para acciones puntuales que el usuario quiere controlar manualmente, como generar un changelog</div>
+            <div class="quiz-option" data-val="c">C) El slash command es mejor para reglas que deben aplicarse siempre</div>
+            <div class="quiz-option" data-val="d">D) El slash command es mejor cuando la tarea involucra múltiples archivos</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">10. Acabás de crear una nueva skill. La buscás con <code>/skills</code> y no aparece. ¿Cuál es lo primero que deberías hacer?</div>
+            <div class="quiz-option" data-val="a">A) Reinstalar Claude Code</div>
+            <div class="quiz-option" data-val="b">B) Verificar que tenés conexión a internet</div>
+            <div class="quiz-option" data-val="c">C) Reiniciar la sesión de Claude Code — las skills se cargan al inicio</div>
+            <div class="quiz-option" data-val="d">D) Mover el archivo a la raíz del proyecto</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <button class="quiz-btn" id="quiz-submit" onclick="submitQuiz()">Ver resultado 🎯</button>
+
+          <div class="quiz-result" id="quiz-result">
+            <div id="result-emoji" style="font-size:2.5rem;margin-bottom:8px"></div>
+            <div class="quiz-score" id="result-score"></div>
+            <div class="quiz-verdict" id="result-verdict"></div>
+            <div class="quiz-msg" id="result-msg"></div>
+            <button class="quiz-restart" onclick="restartQuiz()">🔄 Intentar de nuevo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-results" id="no-results">😕 No se encontraron resultados para tu búsqueda.</div>
+  </main>
+</div>
+
+<footer>Documentación generada por <span>Germán Varas + Claudio </span> · 2026</footer>
+
+<script>
+  // NAV
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('.section');
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      navLinks.forEach(l => l.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      link.classList.add('active');
+      const sec = document.getElementById('section-' + link.dataset.section);
+      if (sec) sec.classList.add('active');
+      document.getElementById('search').value = '';
+      document.getElementById('no-results').style.display = 'none';
+    });
+  });
+
+  // SEARCH
+  document.getElementById('search').addEventListener('input', function() {
+    const q = this.value.trim().toLowerCase();
+    if (!q) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      navLinks[0].classList.add('active');
+      sections[0].classList.add('active');
+      document.getElementById('no-results').style.display = 'none';
+      return;
+    }
+    let any = false;
+    navLinks.forEach(l => l.classList.remove('active'));
+    sections.forEach(sec => {
+      const match = sec.innerText.toLowerCase().includes(q);
+      sec.classList.toggle('active', match);
+      if (match) {
+        any = true;
+        const lnk = document.querySelector(`.nav-link[data-section="${sec.id.replace('section-','')}"]`);
+        if (lnk) lnk.classList.add('active');
+      }
+    });
+    document.getElementById('no-results').style.display = any ? 'none' : 'block';
+  });
+
+  // TROUBLESHOOTING ACCORDION
+  function toggleTrouble(header) {
+    const body = header.nextElementSibling;
+    const isOpen = header.classList.contains('open');
+    header.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+  }
+
+  // QUIZ
+  let answered = {};
+
+  document.querySelectorAll('.quiz-option').forEach(opt => {
+    opt.addEventListener('click', function() {
+      const q = this.closest('.quiz-q');
+      const idx = [...document.querySelectorAll('.quiz-q')].indexOf(q);
+      if (answered[idx] !== undefined) return;
+      answered[idx] = this.dataset.val;
+      q.querySelectorAll('.quiz-option').forEach(o => o.classList.add('disabled'));
+      this.classList.add('selected');
+    });
+  });
+
+  function submitQuiz() {
+    const qs = document.querySelectorAll('.quiz-q');
+    let score = 0;
+    qs.forEach((q, i) => {
+      const correct = q.dataset.correct;
+      const chosen  = answered[i];
+      q.querySelectorAll('.quiz-option').forEach(o => o.classList.add('disabled'));
+      q.querySelectorAll('.quiz-option').forEach(o => {
+        if (o.dataset.val === correct) o.classList.add('correct');
+        else if (o.dataset.val === chosen && chosen !== correct) o.classList.add('wrong');
+      });
+      const fb = q.querySelector('.quiz-feedback');
+      fb.classList.add('show');
+      if (chosen === correct) {
+        score++;
+        fb.classList.add('ok');
+        fb.textContent = '✅ Correcto.';
+      } else if (chosen) {
+        fb.classList.add('bad');
+        const correctText = q.querySelector(`[data-val="${correct}"]`).textContent;
+        fb.textContent = `❌ Incorrecto. La respuesta era: ${correctText}`;
+      } else {
+        fb.classList.add('bad');
+        fb.textContent = '⏭️ Sin responder.';
+      }
+    });
+
+    document.getElementById('quiz-submit').style.display = 'none';
+    const result = document.getElementById('quiz-result');
+    result.classList.add('show');
+    document.getElementById('result-score').textContent = `${score} / 10`;
+
+    const verdicts = [
+      { min: 10, emoji: '🏆', verdict: '¡Perfecto! Sos un crack.', msg: 'Memorizaste la documentación o sos un genio. De cualquier forma, impresionante. Podés cerrar esta página y empezar a cobrar como experto en Claude Code.' },
+      { min: 8,  emoji: '🎉', verdict: '¡Muy bien! Sabés lo que hacés.', msg: 'Claramente leíste la documentación con atención. Solo fallaste en los detalles más sutiles — ese 20% que separa a los que usan Claude Code de los que lo entienden de verdad.' },
+      { min: 6,  emoji: '😅', verdict: 'Pasable. Apenas.', msg: 'Sabés lo básico pero los detalles se te escapan. La documentación sigue disponible — no te va a morder si la leés de nuevo. De hecho, te lo recomendamos fuertemente.' },
+      { min: 4,  emoji: '🤔', verdict: 'Mmm. ¿Leíste algo?', msg: 'Hay señales de que algo llegó. Unas chispas. Lamentablemente no fue suficiente. La buena noticia es que la documentación no va a ningún lado y tiene una función de búsqueda muy cómoda.' },
+      { min: 2,  emoji: '😬', verdict: 'Esto fue... un intento.', msg: 'No podemos decir que no te esforzaste porque no sabemos si lo hiciste. Lo que sí sabemos es que el resultado habla por sí solo. Hay una sección entera de troubleshooting que quizás te sea útil. Para la vida en general.' },
+      { min: 0,  emoji: '💀', verdict: 'Eso fue doloroso de presenciar.', msg: 'Sinceramente no sabemos cómo llegaste hasta acá. ¿Abriste la documentación o solo le diste clic al Quiz directamente? No te juzgamos. Bueno, un poco sí. Volvé a empezar desde Skills, tomá notas.' }
+    ];
+
+    const v = verdicts.find(x => score >= x.min);
+    document.getElementById('result-emoji').textContent = v.emoji;
+    document.getElementById('result-verdict').textContent = v.verdict;
+    document.getElementById('result-msg').textContent = v.msg;
+    result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function restartQuiz() {
+    answered = {};
+    document.querySelectorAll('.quiz-option').forEach(o => {
+      o.classList.remove('selected','correct','wrong','disabled');
+    });
+    document.querySelectorAll('.quiz-feedback').forEach(f => {
+      f.classList.remove('show','ok','bad');
+      f.textContent = '';
+    });
+    document.getElementById('quiz-result').classList.remove('show');
+    document.getElementById('quiz-submit').style.display = '';
+    document.getElementById('quiz-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+</body>
+</html>
