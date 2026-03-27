@@ -1,0 +1,134 @@
+    <div class="section" id="section-skills">
+      <div class="section-header"><h2>🧩 Skills <span class="badge">Conocimiento especializado</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Si te encontrás explicándole lo mismo a Claude repetidamente, eso es una skill esperando ser escrita. Una skill se escribe una vez y se aplica sola siempre que es relevante.</div></div>
+
+        <h3>📌 ¿Qué son las Skills?</h3>
+        <p>Una skill es un archivo <code>SKILL.md</code> dentro de su propia carpeta, que le enseña a Claude cómo realizar una tarea específica. Claude detecta automáticamente cuándo activarla comparando tu solicitud con la descripción de la skill (semantic matching). No necesitás invocarla manualmente.</p>
+
+        <h3>🚀 Crear tu primera skill — paso a paso</h3>
+
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Crear la estructura de carpetas</h4>
+          <p>Cada skill vive en su propia carpeta dentro de <code>.claude/skills/</code>:</p>
+          <pre># Windows PowerShell
+mkdir .claude\skills\pr-review
+
+# Linux / macOS / Git Bash
+mkdir -p .claude/skills/pr-review</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Crear el archivo SKILL.md con frontmatter</h4>
+          <pre># .claude/skills/pr-review/SKILL.md
+---
+name: pr-review
+description: Reviews pull requests for code quality, security and conventions.
+             Use when reviewing PRs, checking code before merge, giving feedback
+             on a branch, or when asked to review code changes.
+---
+
+## Proceso de revisión
+
+1. Leé el diff completo antes de comentar
+2. Verificar: convenciones de naming, manejo de errores, tests
+3. Indicar severity: [blocking] / [suggestion] / [nitpick]
+4. Si hay problemas de seguridad, marcarlos como [critical]
+5. Al terminar: resumen con aprobación o lista de cambios requeridos</pre>
+          <div class="callout info"><span class="callout-icon">📌</span><div>La <strong>description</strong> es lo más importante. Claude la usa para decidir cuándo activar la skill. Incluí verbos y frases que los usuarios van a escribir: "reviewing PRs", "checking code before merge", "give feedback on". Máximo 1.024 caracteres.</div></div>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Reiniciar la sesión de Claude Code</h4>
+          <p>Las skills se cargan al iniciar la sesión. Después de crear o modificar una skill, <strong>cerrá la sesión y abrí una nueva</strong>:</p>
+          <pre>/exit
+# luego en la terminal:
+claude</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <h4>Verificar que la skill cargó</h4>
+          <pre>/skills</pre>
+          <p>Debe aparecer <code>pr-review</code> en la lista con su descripción y origen (personal o proyecto).</p>
+          <p>Si no aparece: revisá la ubicación del archivo (debe ser <code>.claude/skills/pr-review/SKILL.md</code>, no <code>.claude/skills/SKILL.md</code> directamente) y que el frontmatter tenga los campos <code>name</code> y <code>description</code>.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">5</div><div class="step-body">
+          <h4>Probar la skill</h4>
+          <pre>"revisá el PR de la rama feature/login"</pre>
+          <p>Claude debería activar la skill <code>pr-review</code> automáticamente. Si no la activa, la descripción puede ser demasiado vaga — agregá más frases de ejemplo.</p>
+        </div></div>
+
+        <h3>📁 ¿Dónde viven las Skills?</h3>
+        <table>
+          <thead><tr><th>Tipo</th><th>Ubicación</th><th>Alcance</th></tr></thead>
+          <tbody>
+            <tr><td>Skills de proyecto</td><td><code>.claude/skills/nombre/SKILL.md</code> (en la raíz del repo)</td><td>Compartidas con todo el equipo al clonar. Se commitean al repo.</td></tr>
+            <tr><td>Skills personales</td><td><code>~/.claude/skills/nombre/SKILL.md</code></td><td>Te siguen en todos tus proyectos. No se commitean.</td></tr>
+            <tr><td>Windows (personal)</td><td><code>C:\Users\&lt;usuario&gt;\.claude\skills\nombre\SKILL.md</code></td><td>Equivalente a personal en Windows.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>⚖️ Skills vs. CLAUDE.md vs. Slash Commands</h3>
+        <table>
+          <thead><tr><th>Mecanismo</th><th>Cuándo carga</th><th>Cómo se activa</th><th>Caso de uso ideal</th></tr></thead>
+          <tbody>
+            <tr><td>📄 <strong>CLAUDE.md</strong></td><td>En cada conversación</td><td>Automático siempre</td><td>Reglas globales del proyecto: stack, convenciones, restricciones</td></tr>
+            <tr><td>🧩 <strong>Skills</strong></td><td>A demanda, cuando coincide semánticamente</td><td>Automático por contexto</td><td>Conocimiento especializado para tareas específicas</td></tr>
+            <tr><td>⚡ <strong>Slash Commands</strong></td><td>Solo cuando se invoca</td><td>Manual por el usuario</td><td>Acciones explícitas y repetibles que el usuario decide cuándo ejecutar</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🏆 Prioridad de Skills</h3>
+        <p>Cuando hay dos skills con el mismo <code>name</code>, gana la de mayor prioridad:</p>
+        <table>
+          <thead><tr><th>Prioridad</th><th>Tipo</th><th>Ubicación</th></tr></thead>
+          <tbody>
+            <tr><td>1 (más alta)</td><td>Managed (Enterprise)</td><td>Configuración administrada por la organización</td></tr>
+            <tr><td>2</td><td>Personal (User)</td><td><code>~/.claude/skills/</code></td></tr>
+            <tr><td>3</td><td>Project</td><td><code>.claude/skills/</code> del repo</td></tr>
+            <tr><td>4 (más baja)</td><td>Plugins</td><td>Skills de plugins instalados</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🔧 Campos del frontmatter</h3>
+        <table>
+          <thead><tr><th>Campo</th><th>Requerido</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>✅ Sí</td><td>Identificador único. Solo minúsculas, números y guiones. Máx. 64 caracteres.</td></tr>
+            <tr><td><code>description</code></td><td>✅ Sí</td><td>Le dice a Claude cuándo usar la skill. Cuanto más específica y con más ejemplos de frases, mejor. Máx. 1.024 caracteres.</td></tr>
+            <tr><td><code>allowed-tools</code></td><td>❌ No</td><td>Restringe qué herramientas puede usar Claude cuando la skill está activa. Útil para skills de solo lectura.</td></tr>
+            <tr><td><code>model</code></td><td>❌ No</td><td>Especifica qué modelo usar cuando esta skill está activa. Ej: <code>claude-haiku-4-5-20251001</code> para skills de tareas simples.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>📂 Progressive disclosure con references/</h3>
+        <p>Si tu skill necesita guías extensas, no las pongas todas en SKILL.md — eso ocupa contexto siempre. Usá la carpeta <code>references/</code>:</p>
+        <pre>.claude/skills/refactor-dotnet/
+├── SKILL.md          ← instrucciones esenciales (&lt;500 líneas)
+└── references/
+    ├── patterns.md   ← guías extensas de CQRS, Repository, etc.
+    └── examples.md   ← ejemplos de código de referencia</pre>
+        <p>En el SKILL.md, referencialos explícitamente para que Claude los lea cuando los necesita:</p>
+        <pre>---
+name: refactor-dotnet
+description: Refactoriza código C# / .NET 8...
+---
+
+## Instrucciones base
+1. Leé el archivo completo antes de modificar
+2. Aplicar patrones de la guía en references/patterns.md si aplica
+3. Al terminar: `dotnet build` y listar cambios
+
+## Referencia
+- Patrones detallados: @references/patterns.md
+- Ejemplos: @references/examples.md</pre>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Claude solo carga el contenido de <code>references/</code> cuando lo necesita para la tarea. SKILL.md siempre se carga, references/ se carga on-demand. Esto evita llenar el contexto con material que no siempre es necesario.</div></div>
+
+        <h3>🔄 Múltiples skills activas simultáneamente</h3>
+        <p>Claude puede activar más de una skill al mismo tiempo si la tarea coincide con varias. Las instrucciones se combinan en el contexto. Si hay conflictos entre instrucciones de distintas skills, CLAUDE.md tiene precedencia, y entre skills gana la de mayor prioridad en el orden de la tabla de arriba.</p>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Si tenés skills con instrucciones contradictorias (ej: una dice "usá tabs" y otra "usá espacios"), el resultado puede ser inconsistente. Diseñá las skills para que sean complementarias, no solapadas.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ AGENTE ══ -->

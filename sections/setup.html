@@ -1,0 +1,105 @@
+    <div class="section active" id="section-setup">
+      <div class="section-header"><h2>⚙️ Instalación CLI <span class="badge">Windows</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Claude Code es una CLI que corre en la terminal. Una vez instalada globalmente, la ejecutás desde cualquier directorio — VS Code, Visual Studio, Windows Terminal o PowerShell.</div></div>
+
+        <h3>📋 Requisitos previos</h3>
+        <table>
+          <thead><tr><th>Requisito</th><th>Notas</th><th>Verificación</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Cuenta Anthropic</strong></td><td>Suscripción Claude Pro o Anthropic Console (API key)</td><td>claude.ai / console.anthropic.com</td></tr>
+            <tr><td><strong>Git for Windows</strong></td><td>Recomendado para proyectos con control de versiones</td><td><code>git --version</code></td></tr>
+            <tr><td><strong>Node.js 18+</strong></td><td>Solo necesario si instalás vía npm. El instalador nativo lo incluye.</td><td><code>node --version</code></td></tr>
+          </tbody>
+        </table>
+
+        <h3>🚀 Instalación</h3>
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Método A — Instalador nativo (recomendado para Windows)</h4>
+          <p>Abrí <strong>PowerShell</strong> y ejecutá:</p>
+          <pre>irm https://claude.ai/install.ps1 | iex</pre>
+          <p>El instalador nativo <strong>incluye sus propias dependencias</strong> — no necesitás instalar Node.js por separado. Se actualiza automáticamente en segundo plano.</p>
+          <p>Alternativa con <strong>WinGet</strong>:</p>
+          <pre>winget install Anthropic.ClaudeCode</pre>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><div>Si PowerShell bloquea la ejecución de scripts, ejecutá primero: <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code> y luego volvé a correr el instalador.</div></div>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Método B — npm (si ya tenés Node.js 18+)</h4>
+          <pre>npm install -g @anthropic-ai/claude-code</pre>
+          <p>Con este método, <code>claude</code> se instala en <code>%APPDATA%\npm</code>. Si el comando no se reconoce después de instalar, verificá que esa ruta esté en el PATH del sistema.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Verificar la instalación</h4>
+          <pre>claude --version</pre>
+          <p>O desde dentro de una sesión, usá el slash command:</p>
+          <pre>/doctor</pre>
+          <p>Verifica versión, permisos y conectividad con la API. Si algo está mal, lo reporta con detalle.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <h4>Primera ejecución y autenticación</h4>
+          <p>Navegá a cualquier proyecto y ejecutá:</p>
+          <pre>claude</pre>
+          <p>La primera vez te pedirá autenticación. Ver sección <strong>🔑 Autenticación</strong> para las opciones disponibles (navegador o API key).</p>
+        </div></div>
+
+        <h3>🖥️ Ejecutar desde cualquier lugar en Windows</h3>
+        <p>Claude Code usa el <strong>directorio donde lo ejecutás</strong> como raíz del proyecto. Lo primero siempre es posicionarte en la carpeta correcta antes de correr <code>claude</code>.</p>
+        <table>
+          <thead><tr><th>Terminal</th><th>Cómo abrir en el directorio del proyecto</th></tr></thead>
+          <tbody>
+            <tr><td><strong>VS Code</strong></td><td>Terminal integrado (<code>Ctrl+`</code>) — abre directamente en el workspace. Solo escribís <code>claude</code>.</td></tr>
+            <tr><td><strong>Visual Studio</strong></td><td>Menú <strong>View → Terminal</strong> (VS 2022+) — abre en el directorio de la solución. Escribís <code>claude</code> ahí.</td></tr>
+            <tr><td><strong>Windows Terminal / PowerShell</strong></td><td><code>cd C:\ruta\al\proyecto</code> y después <code>claude</code>.</td></tr>
+            <tr><td><strong>Explorador de Windows</strong></td><td>Clic en la barra de direcciones de la carpeta del proyecto → escribís <code>powershell</code> → Enter. Abre PowerShell directo en ese directorio.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div><strong>Si <code>claude</code> no se reconoce como comando</strong> después de instalar: cerrá y volvé a abrir la terminal. Windows no recarga el PATH automáticamente en sesiones ya abiertas.</div></div>
+
+        <h3>🔧 Problemas comunes en Windows</h3>
+        <table>
+          <thead><tr><th>Problema</th><th>Causa</th><th>Solución</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>claude</code> no encontrado (instalación npm)</td>
+              <td>PATH no incluye la carpeta npm global</td>
+              <td>Cerrá y abrí la terminal. Si persiste: verificá que <code>%APPDATA%\npm</code> esté en el PATH del sistema (Panel de control → Variables de entorno).</td>
+            </tr>
+            <tr>
+              <td><code>claude</code> no encontrado (instalador nativo)</td>
+              <td>PATH no recargado en la sesión actual</td>
+              <td>Cerrá y abrí la terminal. Si persiste, reinstalá con el script oficial.</td>
+            </tr>
+            <tr>
+              <td>El script de instalación falla en PowerShell</td>
+              <td>Política de ejecución de scripts bloqueada</td>
+              <td>Ejecutá primero: <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code>. Luego volvé a correr el instalador.</td>
+            </tr>
+            <tr>
+              <td>Falla en redes corporativas</td>
+              <td>Proxy bloqueando el script o la API de Anthropic</td>
+              <td>Usá WinGet: <code>winget install Anthropic.ClaudeCode</code>. Para la API, consultá con el área de infraestructura sobre el proxy y la autenticación via API key.</td>
+            </tr>
+            <tr>
+              <td>Visual Studio no encuentra <code>claude</code></td>
+              <td>El terminal de VS puede tener un PATH diferente al del sistema</td>
+              <td>Usá el terminal integrado de VS Code, o abrí PowerShell externo, navegá al directorio del proyecto con <code>cd</code> y ejecutá <code>claude</code> desde ahí.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>📁 Verificar que Claude detectó tu proyecto</h3>
+        <p>Una vez dentro de la sesión, estos comandos confirman que Claude cargó el contexto correcto:</p>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">/status</span></td><td class="cli-desc">Muestra el estado de configuración: directorio activo, modelo, skills cargadas</td></tr>
+          <tr><td><span class="cli-cmd">/skills</span></td><td class="cli-desc">Lista las skills disponibles para el proyecto actual</td></tr>
+          <tr><td><span class="cli-cmd">/mcp</span></td><td class="cli-desc">Estado de los MCP servers configurados</td></tr>
+          <tr><td><span class="cli-cmd">/doctor</span></td><td class="cli-desc">Diagnóstico completo del entorno (versión, permisos, conectividad)</td></tr>
+        </table>
+        <div class="callout ok"><span class="callout-icon">✅</span><div>Si <code>/skills</code> lista las skills del proyecto y <code>/doctor</code> no reporta errores, Claude está listo para trabajar.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ AUTENTICACIÓN ══ -->

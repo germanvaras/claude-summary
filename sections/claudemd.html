@@ -1,0 +1,125 @@
+    <div class="section" id="section-claudemd">
+      <div class="section-header"><h2>📄 CLAUDE.md <span class="badge">Memoria del proyecto</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> CLAUDE.md es la memoria persistente de tu proyecto. Todo lo que escribís ahí, Claude lo sabe desde el primer mensaje de cada conversación — sin que tengas que repetirlo.</div></div>
+
+        <h3>📁 Ubicaciones y diferencias</h3>
+        <table>
+          <thead><tr><th>Ubicación</th><th>Diferencia</th><th>Cuándo carga</th><th>Alcance</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>./CLAUDE.md</code></td>
+              <td>En la raíz del proyecto, visible en el repositorio</td>
+              <td>Siempre que Claude corra en ese directorio</td>
+              <td>Todo el proyecto</td>
+            </tr>
+            <tr>
+              <td><code>./.claude/CLAUDE.md</code></td>
+              <td>Dentro de la carpeta <code>.claude/</code>. Equivalente a <code>./CLAUDE.md</code> en alcance. Útil para mantener la raíz limpia.</td>
+              <td>Siempre que Claude corra en ese directorio</td>
+              <td>Todo el proyecto</td>
+            </tr>
+            <tr>
+              <td><code>~/.claude/CLAUDE.md</code></td>
+              <td>CLAUDE.md personal global. Aplica a todos tus proyectos. Para tus preferencias personales de trabajo.</td>
+              <td>Siempre, en cualquier proyecto</td>
+              <td>Todos tus proyectos</td>
+            </tr>
+            <tr>
+              <td><code>./src/CLAUDE.md</code></td>
+              <td>Instrucciones específicas para un subdirectorio. Solo aplica cuando Claude trabaja dentro de <code>src/</code>.</td>
+              <td>On-demand: solo cuando Claude trabaja dentro de ese directorio</td>
+              <td>Solo ese subdirectorio</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div><strong>¿<code>CLAUDE.md</code> vs <code>.claude/CLAUDE.md</code>?</strong> Son equivalentes en alcance — ambos cargan siempre que Claude corra desde ese directorio. La diferencia es de visibilidad: <code>CLAUDE.md</code> en la raíz es más visible para el equipo; <code>.claude/CLAUDE.md</code> agrupa toda la configuración de Claude en un lugar. Elegí según la convención del proyecto.</div></div>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div><strong>Carga aditiva por jerarquía:</strong> Claude combina todos los CLAUDE.md relevantes en cascada — global → proyecto → subdirectorio. Los más específicos tienen precedencia si hay contradicciones. Los de subdirectorios cargan <em>on-demand</em>.</div></div>
+
+        <h3>✍️ ¿Qué poner en CLAUDE.md?</h3>
+        <ul>
+          <li>🏗️ <strong>Arquitectura del proyecto</strong> — estructura de capas, patrones usados, decisiones importantes</li>
+          <li>📐 <strong>Estándares de código</strong> — estilo, naming conventions, linters, formateadores</li>
+          <li>🚫 <strong>Restricciones explícitas</strong> — "nunca modificar migraciones", "no usar DbContext en controllers"</li>
+          <li>🛠️ <strong>Stack y comandos frecuentes</strong> — build, test, run, deploy</li>
+          <li>🔗 <strong>Contexto de negocio</strong> — glosario del dominio, entidades clave</li>
+        </ul>
+
+        <h3>📏 Longitud recomendada</h3>
+        <p>CLAUDE.md se carga en <strong>cada conversación</strong> y consume tokens del contexto. Mantenelo bajo las <strong>200 líneas</strong>. El material extenso va mejor en skills con progressive disclosure:</p>
+        <table>
+          <thead><tr><th>Contenido</th><th>Dónde ponerlo</th></tr></thead>
+          <tbody>
+            <tr><td>Reglas y convenciones del proyecto (siempre necesarias)</td><td>CLAUDE.md</td></tr>
+            <tr><td>Guías de arquitectura detalladas (solo cuando se refactoriza)</td><td>Skill → references/</td></tr>
+            <tr><td>Checklists de revisión de PRs</td><td>Skill pr-review</td></tr>
+            <tr><td>Documentación de APIs internas</td><td>Skill → references/</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🏗️ Estructura recomendada</h3>
+        <pre># NombreDelProyecto
+
+## Stack
+- [lenguaje/framework principal]
+- [base de datos]
+- [testing framework]
+
+## Arquitectura
+[descripción de capas o módulos principales]
+
+## Convenciones de código
+- [naming conventions]
+- [patrones obligatorios]
+- [qué evitar]
+
+## Restricciones importantes
+- [cosas que Claude nunca debe hacer]
+
+## Comandos frecuentes
+- build: `[comando]`
+- test: `[comando]`
+- lint: `[comando]`</pre>
+
+        <h3>💡 Ejemplo real completo</h3>
+        <pre># EcommerceApi
+
+## Stack
+- .NET 8 · ASP.NET Core Minimal APIs
+- Entity Framework Core 8 · SQL Server 2022
+- xUnit · Moq · FluentAssertions
+
+## Arquitectura
+Clean Architecture: Domain → Application → Infrastructure → API
+- Commands y Queries separados (CQRS)
+- Repositorios abstraen EF Core de Application
+
+## Convenciones de código
+- Record types para DTOs y Value Objects
+- Métodos async terminan en Async
+- Nunca retornar null: usar Result&lt;T&gt; del paquete FluentResults
+- EF Core: AsNoTracking() en queries de solo lectura
+
+## Restricciones
+- Nunca modificar migraciones existentes — crear nueva migración
+- No usar DbContext en Controllers ni Application — solo en Repositories
+- No hardcodear connection strings
+
+## Comandos
+- build:   `dotnet build`
+- test:    `dotnet test --filter Category=Unit`
+- lint:    `dotnet format`
+- migrate: `dotnet ef migrations add &lt;Nombre&gt;`</pre>
+
+        <h3>🚀 Generar uno automáticamente con /init</h3>
+        <p>Si el proyecto ya tiene código, Claude puede analizar el repositorio y generar un CLAUDE.md inicial:</p>
+        <pre>/init</pre>
+        <p>Claude lee la estructura del proyecto, los archivos de configuración (<code>package.json</code>, <code>.csproj</code>, <code>pyproject.toml</code>, etc.) y propone un CLAUDE.md con el stack y convenciones detectadas. <strong>Revisá y editá el resultado antes de commitearlo</strong> — Claude puede detectar el stack correctamente pero no conoce tus restricciones de negocio.</p>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Una instrucción en el chat puede prevalecer sobre CLAUDE.md si contradice directamente lo que dice. CLAUDE.md establece el comportamiento <em>por defecto</em>, no reglas absolutas. Para restricciones que deben ser imposibles de saltear, usá permisos en <code>settings.json</code> (deny rules).</div></div>
+      </div>
+    </div>
+
+    <!-- ══ HOOKS ══ -->

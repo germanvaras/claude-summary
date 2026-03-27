@@ -1,0 +1,92 @@
+    <div class="section" id="section-slash">
+      <div class="section-header"><h2>⚡ Slash Commands <span class="badge">Control manual</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Si las skills son el piloto automático, los slash commands son el joystick manual. Los controlás vos, cuando querés. Existen tres categorías distintas con origen diferente.</div></div>
+
+        <h3>1️⃣ Built-in commands — los del sistema</h3>
+        <p>Comandos que Claude Code trae por defecto. No se configuran — están siempre disponibles dentro de una sesión.</p>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">/help</span></td><td class="cli-desc">Lista todos los comandos disponibles en la sesión actual</td></tr>
+          <tr><td><span class="cli-cmd">/status</span></td><td class="cli-desc">Muestra el estado de configuración: modelo activo, directorio, skills y permisos cargados</td></tr>
+          <tr><td><span class="cli-cmd">/clear</span></td><td class="cli-desc">Limpia el historial de la conversación (aliases: <code>/reset</code>, <code>/new</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/compact [instrucciones]</span></td><td class="cli-desc">Comprime el historial para liberar espacio de contexto. Podés pasar instrucciones de foco: <code>/compact focalizá en los cambios del módulo Orders</code></td></tr>
+          <tr><td><span class="cli-cmd">/context</span></td><td class="cli-desc">Visualizar el uso de tokens del contexto actual</td></tr>
+          <tr><td><span class="cli-cmd">/config</span></td><td class="cli-desc">Abre la interfaz de configuración (alias: <code>/settings</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/permissions</span></td><td class="cli-desc">Ver y actualizar permisos para la sesión actual (alias: <code>/allowed-tools</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/model [modelo]</span></td><td class="cli-desc">Ver o cambiar el modelo para esta sesión</td></tr>
+          <tr><td><span class="cli-cmd">/init</span></td><td class="cli-desc">Genera un CLAUDE.md inicial analizando el proyecto actual</td></tr>
+          <tr><td><span class="cli-cmd">/memory</span></td><td class="cli-desc">Editar archivos CLAUDE.md y memoria del proyecto</td></tr>
+          <tr><td><span class="cli-cmd">/mcp</span></td><td class="cli-desc">Ver el estado de los servidores MCP conectados</td></tr>
+          <tr><td><span class="cli-cmd">/skills</span></td><td class="cli-desc">Lista todas las skills activas para el directorio actual</td></tr>
+          <tr><td><span class="cli-cmd">/hooks</span></td><td class="cli-desc">Ver las configuraciones de hooks activas</td></tr>
+          <tr><td><span class="cli-cmd">/agents</span></td><td class="cli-desc">Ver configuraciones de agentes</td></tr>
+          <tr><td><span class="cli-cmd">/doctor</span></td><td class="cli-desc">Diagnóstico completo: versión, autenticación, conectividad</td></tr>
+          <tr><td><span class="cli-cmd">/plan [descripción]</span></td><td class="cli-desc">Entrar en modo planificación — Claude describe qué haría pero no ejecuta nada</td></tr>
+          <tr><td><span class="cli-cmd">/resume [sesión]</span></td><td class="cli-desc">Retomar una conversación anterior (alias: <code>/continue</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/exit</span></td><td class="cli-desc">Cierra la sesión (alias: <code>/quit</code>)</td></tr>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>No todos los built-in commands están disponibles en todos los contextos. La disponibilidad depende del plan, la plataforma (CLI, VS Code, etc.) y la versión instalada. Usá <code>/help</code> para ver los que tenés activos en tu sesión.</div></div>
+
+        <h3>2️⃣ Skill commands — los que creás vos</h3>
+        <p>Comandos custom definidos en archivos <code>.md</code> dentro de las carpetas <code>commands/</code>. Un archivo en <code>.claude/commands/deploy.md</code> crea el comando <code>/deploy</code>. La diferencia con una skill: el usuario los invoca manualmente, no se activan por contexto semántico.</p>
+        <table>
+          <thead><tr><th>Tipo</th><th>Ubicación</th><th>Alcance</th></tr></thead>
+          <tbody>
+            <tr><td>Personales</td><td><code>~/.claude/commands/nombre.md</code></td><td>Todos tus proyectos</td></tr>
+            <tr><td>De proyecto</td><td><code>.claude/commands/nombre.md</code></td><td>Compartidos con el equipo al clonar</td></tr>
+          </tbody>
+        </table>
+
+        <h4>Estructura de un comando custom:</h4>
+        <pre># .claude/commands/daily-standup.md
+
+Generá un resumen de standup basado en:
+1. Commits de las últimas 24 horas
+2. Archivos modificados
+3. TODOs o FIXMEs nuevos
+
+## ✅ Qué hice ayer
+## 🎯 Qué voy a hacer hoy
+## 🚧 Bloqueos o dudas</pre>
+
+        <p>El usuario lo invoca simplemente con:</p>
+        <pre>/daily-standup</pre>
+
+        <h4>Pasar argumentos con $ARGUMENTS:</h4>
+        <p>Usá <code>$ARGUMENTS</code> para capturar todo el texto que siga al nombre del comando:</p>
+        <pre># .claude/commands/review.md
+
+Revisá el código de la rama $ARGUMENTS:
+1. Verificá convenciones de naming
+2. Revisá manejo de errores y edge cases
+3. Verificá que haya tests suficientes
+4. Listá los cambios requeridos o aprobá</pre>
+
+        <p>Invocación:</p>
+        <pre>/review feature/login
+# $ARGUMENTS = "feature/login"
+
+/review feature/order-refactor --strict
+# $ARGUMENTS = "feature/order-refactor --strict"</pre>
+        <div class="callout info"><span class="callout-icon">📌</span><div><code>$ARGUMENTS</code> captura <em>todo</em> lo que sigue al nombre del comando como un string. Si necesitás múltiples parámetros, podés usar convenciones propias dentro del texto del comando (ej: parsear por espacio o guion) y describir el formato esperado en el archivo del comando.</div></div>
+
+        <h3>3️⃣ MCP prompts — comandos de servidores externos</h3>
+        <p>Los servidores MCP pueden exponer prompts predefinidos que aparecen como slash commands con el formato <code>/mcp__&lt;servidor&gt;__&lt;prompt&gt;</code>. Los provee el servidor — no los creás vos.</p>
+        <pre>/mcp__github__create-pr
+/mcp__postgres__explain-query
+/mcp__slack__post-summary</pre>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Los MCP prompts disponibles aparecen en <code>/help</code> cuando el servidor MCP correspondiente está conectado y activo.</div></div>
+
+        <h3>⚖️ ¿Cuándo uso un slash command vs una skill?</h3>
+        <table>
+          <thead><tr><th>Criterio</th><th>Slash Command</th><th>Skill</th></tr></thead>
+          <tbody>
+            <tr><td>¿Quién decide cuándo ejecutar?</td><td>El usuario (invocación manual)</td><td>Claude (activación automática por contexto)</td></tr>
+            <tr><td>¿Necesitás pasar parámetros?</td><td>Sí, via $ARGUMENTS</td><td>No — el contexto de la conversación es el parámetro</td></tr>
+            <tr><td>Caso típico</td><td>Generar changelog, reporte de cobertura, standup</td><td>Revisión de PRs, refactoring, escritura de tests</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PERMISOS ══ -->

@@ -1,0 +1,235 @@
+    <div class="section" id="section-mcp">
+      <div class="section-header"><h2>🔌 MCP Servers <span class="badge">Herramientas externas</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> MCP (Model Context Protocol) es el sistema que permite a Claude interactuar con herramientas externas reales: bases de datos, APIs, servicios cloud. Sin MCP, Claude solo trabaja con archivos locales. Con MCP, puede hacer queries SQL, crear issues en GitHub, buscar en la web y mucho más.</div></div>
+
+        <h3>🧩 Qué es MCP realmente</h3>
+        <p>MCP es un <strong>protocolo estándar abierto</strong> (publicado por Anthropic, con spec pública) que define cómo los modelos de lenguaje se comunican con herramientas externas. La idea clave es la estandarización: un servidor MCP funciona con cualquier cliente compatible (Claude Code, Claude Desktop, otros).</p>
+        <p>Un <strong>servidor MCP</strong> es un proceso separado que expone capacidades al modelo. Claude Code lo inicia, se conecta a él y puede invocar sus funciones durante una tarea. Desde el punto de vista de Claude, las herramientas del servidor MCP aparecen como herramientas adicionales junto a <code>Read</code>, <code>Write</code>, <code>Bash</code>, etc.</p>
+
+        <pre>Claude Code (cliente MCP)
+│
+├── Herramientas nativas: Read, Write, Edit, Bash, Grep...
+│
+└── Herramientas MCP (vía servidor externo):
+    ├── query_database(sql)         ← postgres MCP server
+    ├── create_issue(title, body)   ← github MCP server
+    └── search_web(query)           ← brave-search MCP server</pre>
+
+        <h3>🔌 Tipos de transporte</h3>
+        <p>Los servidores MCP pueden comunicarse con Claude Code de dos formas:</p>
+        <table>
+          <thead><tr><th>Transporte</th><th>Cómo funciona</th><th>Cuándo usarlo</th><th>Config</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>stdio</strong></td>
+              <td>Claude Code lanza el server como proceso hijo. Comunican por stdin/stdout (JSON-RPC). El server vive mientras Claude Code corre.</td>
+              <td>La mayoría de los casos: servers locales, npx, binarios</td>
+              <td><code>command</code> + <code>args</code></td>
+            </tr>
+            <tr>
+              <td><strong>HTTP (Streamable HTTP)</strong></td>
+              <td>El server corre independientemente (puede ser remoto). Claude Code se conecta vía HTTP POST/GET. Opcionalmente usa SSE para streaming de respuestas.</td>
+              <td>Servers remotos, servicios cloud, APIs compartidas del equipo. Recomendado para casos remotos.</td>
+              <td><code>type: "http"</code> + <code>url</code> + <code>headers</code></td>
+            </tr>
+            <tr>
+              <td><strong>SSE</strong> ⚠️ Deprecado</td>
+              <td>Transporte anterior basado en Server-Sent Events. Sigue funcionando pero está deprecado.</td>
+              <td>Solo para compatibilidad con servidores legados que aún no migraron a HTTP.</td>
+              <td><code>type: "sse"</code> + <code>url</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Para servidores locales (npx, binarios), usá <strong>stdio</strong>. Para servicios remotos o APIs del equipo, usá <strong>HTTP</strong> — es el transporte recomendado para uso cloud. <strong>Evitá SSE</strong> en servidores nuevos: está deprecado.</div></div>
+
+        <h3>📦 Instalar un servidor MCP</h3>
+        <p>Hay tres formas de instalar un servidor:</p>
+
+        <div class="step"><div class="step-num">A</div><div class="step-body">
+          <h4>Via npx (automático, sin instalación previa)</h4>
+          <p>El método más simple: ponés <code>npx</code> como comando y Claude Code descarga el servidor la primera vez que lo necesita.</p>
+          <pre>"command": "npx",
+"args": ["-y", "@modelcontextprotocol/server-github"]</pre>
+          <p>El <code>-y</code> acepta automáticamente la instalación. Requiere conexión a internet y Node.js.</p>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><div>En redes corporativas con proxy, <code>npx</code> puede fallar. En ese caso, instalá el paquete globalmente primero: <code>npm install -g @modelcontextprotocol/server-github</code> y luego usá el binario directamente.</div></div>
+        </div></div>
+
+        <div class="step"><div class="step-num">B</div><div class="step-body">
+          <h4>Instalación global con npm</h4>
+          <pre>npm install -g @modelcontextprotocol/server-postgres</pre>
+          <p>Más confiable para uso continuo. Después de instalar, podés usar el comando directamente en la config sin npx:</p>
+          <pre>"command": "mcp-server-postgres",
+"args": ["postgresql://user:pass@localhost/mibase"]</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">C</div><div class="step-body">
+          <h4>Servidor HTTP remoto</h4>
+          <p>Si el servidor ya corre en algún lugar (tu infra, un servicio del equipo):</p>
+          <pre>"url": "http://mcp-server.interno:8080"</pre>
+        </div></div>
+
+        <h3>⚙️ Configuración en settings.json</h3>
+        <p>Los servidores MCP se configuran en el bloque <code>mcpServers</code> de <code>settings.json</code>. Podés tener múltiples servidores activos simultáneamente.</p>
+
+        <h4>Estructura para servidor stdio:</h4>
+        <pre>{
+  "mcpServers": {
+    "nombre-del-server": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-NOMBRE"],
+      "env": {
+        "VARIABLE": "valor"
+      }
+    }
+  }
+}</pre>
+
+        <h4>Estructura para servidor HTTP:</h4>
+        <pre>{
+  "mcpServers": {
+    "mi-server-remoto": {
+      "type": "http",
+      "url": "https://api.ejemplo.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${API_KEY}"
+      }
+    }
+  }
+}</pre>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>No pongas credenciales reales en <code>.claude/settings.json</code> del proyecto (va al repositorio). Usá <code>settings.local.json</code> para valores sensibles, o variables de entorno del sistema en lugar del bloque <code>env</code>.</div></div>
+
+        <h3>🧱 Los tres componentes de MCP</h3>
+        <p>Un servidor MCP puede exponer hasta tres tipos de capacidades:</p>
+
+        <table>
+          <thead><tr><th>Componente</th><th>Qué es</th><th>Cómo lo usa Claude</th><th>Ejemplo</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Tools</strong></td>
+              <td>Funciones que Claude puede invocar para <em>hacer</em> algo: ejecutar queries, crear recursos, llamar APIs.</td>
+              <td>Automáticamente cuando son relevantes, o cuando vos lo pedís explícitamente. Aparecen en el contexto igual que <code>Read</code> o <code>Bash</code>.</td>
+              <td><code>execute_query(sql)</code>, <code>create_issue(title, body)</code>, <code>post_message(channel, text)</code></td>
+            </tr>
+            <tr>
+              <td><strong>Resources</strong></td>
+              <td>Datos que Claude puede <em>leer</em>: registros de base de datos, archivos remotos, esquemas. Son read-only por definición.</td>
+              <td>Claude los solicita para obtener contexto. El servidor devuelve el contenido que se inyecta al contexto de Claude.</td>
+              <td>Esquema completo de la DB, documentación de la API, logs de la última hora</td>
+            </tr>
+            <tr>
+              <td><strong>Prompts</strong></td>
+              <td>Templates de prompts predefinidos por el servidor que aparecen como slash commands con el prefijo <code>/mcp__servidor__nombre</code>.</td>
+              <td>El usuario los invoca manualmente, igual que un slash command custom.</td>
+              <td><code>/mcp__github__create-pr</code>, <code>/mcp__postgres__explain-query</code></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>🔌 Servers verificados y disponibles</h3>
+        <p>El namespace oficial en npm es <code>@modelcontextprotocol/</code>. Antes de usar cualquier servidor de terceros, verificá que exista en <strong>npmjs.com</strong>.</p>
+        <table>
+          <thead><tr><th>Paquete</th><th>Qué provee</th><th>Credencial requerida</th></tr></thead>
+          <tbody>
+            <tr><td><code>@modelcontextprotocol/server-postgres</code></td><td>Queries y esquema de PostgreSQL</td><td>Connection string en args</td></tr>
+            <tr><td><code>@modelcontextprotocol/server-github</code></td><td>Repos, issues, PRs, búsqueda de código</td><td><code>GITHUB_PERSONAL_ACCESS_TOKEN</code></td></tr>
+            <tr><td><code>@modelcontextprotocol/server-slack</code></td><td>Leer canales, enviar mensajes</td><td><code>SLACK_BOT_TOKEN</code>, <code>SLACK_TEAM_ID</code></td></tr>
+            <tr><td><code>@modelcontextprotocol/server-brave-search</code></td><td>Búsqueda web via Brave Search API</td><td><code>BRAVE_API_KEY</code></td></tr>
+            <tr><td><code>@modelcontextprotocol/server-sqlite</code></td><td>Queries SQLite sobre archivos locales</td><td>Ruta al archivo .db en args</td></tr>
+            <tr><td><code>@modelcontextprotocol/server-filesystem</code></td><td>Acceso extendido al sistema de archivos</td><td>Rutas permitidas en args</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>No existe un servidor oficial para SQL Server (MSSQL) en el namespace <code>@modelcontextprotocol/</code>. Para SQL Server, buscá en npmjs.com o considerá exponer los datos via un servidor propio con el SDK de MCP.</div></div>
+
+        <h3>💡 Ejemplo funcional completo — GitHub</h3>
+        <p>Configuración en <code>.claude/settings.local.json</code> (no va al repo — tiene el token):</p>
+        <pre>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_tu_token_aqui"
+      }
+    }
+  }
+}</pre>
+        <p>Una vez conectado, Claude puede hacer esto automáticamente:</p>
+        <pre>> "buscá issues abiertos con el label 'bug' en el repo actual"
+# Claude invoca: list_issues(labels=["bug"], state="open")
+# Muestra: 3 issues encontrados con su título, número y descripción
+
+> "creá un issue: 'Fix null reference en OrderService' con label bug"
+# Claude invoca: create_issue(title=..., body=..., labels=["bug"])
+# Resultado: Issue #47 creado en GitHub
+
+> "mostrá el último PR mergeado"
+# Claude invoca: list_pull_requests(state="closed", sort="updated")
+# Muestra: PR #46 - "Add CQRS to Orders module"</pre>
+
+        <h3>💡 Ejemplo funcional completo — PostgreSQL</h3>
+        <p>Configuración en <code>.claude/settings.local.json</code>:</p>
+        <pre>{
+  "mcpServers": {
+    "staging-db": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://readonly_user:pass@staging-db:5432/ecommerce"
+      ]
+    }
+  }
+}</pre>
+        <p>En la sesión:</p>
+        <pre>> "¿cuántos pedidos tiene el estado 'pending' de los últimos 7 días?"
+# Claude invoca: query("SELECT COUNT(*) FROM orders WHERE status='pending' AND created_at > NOW()-INTERVAL '7 days'")
+# Resultado: 142 pedidos
+
+> "mostrá el esquema de la tabla orders"
+# Claude invoca: describe_table("orders")
+# Muestra: columnas, tipos, constraints, índices</pre>
+
+        <h3>🔧 Cómo debuggear la conexión MCP</h3>
+
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Verificar estado dentro de la sesión</h4>
+          <pre>/mcp</pre>
+          <p>Muestra todos los servidores configurados con su estado: conectado, desconectado o error.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Ver errores de inicialización</h4>
+          <pre>claude --verbose</pre>
+          <p>En modo verbose verás exactamente por qué falla la conexión: paquete no instalado, credencial incorrecta, host no accesible.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Checklist de problemas comunes</h4>
+          <table>
+            <thead><tr><th>Síntoma</th><th>Causa probable</th><th>Solución</th></tr></thead>
+            <tbody>
+              <tr><td>Server aparece como desconectado</td><td>Paquete npx no instalado / red bloqueada</td><td>Instalar globalmente: <code>npm install -g @modelcontextprotocol/server-NOMBRE</code></td></tr>
+              <tr><td>Error de autenticación</td><td>Variable de entorno faltante o incorrecta</td><td>Verificar que la variable esté definida: <code>echo %GITHUB_PERSONAL_ACCESS_TOKEN%</code></td></tr>
+              <tr><td>Server conectado pero sin tools disponibles</td><td>Error al inicializar el servidor</td><td>Correr <code>claude --verbose</code> y leer el stack trace del servidor</td></tr>
+              <tr><td>Connection refused (HTTP server)</td><td>El servidor remoto no está corriendo</td><td>Verificar con <code>curl http://host:puerto/health</code></td></tr>
+            </tbody>
+          </table>
+        </div></div>
+
+        <h3>🏗️ Crear tu propio servidor MCP</h3>
+        <p>Si necesitás integrar una API o sistema que no tiene servidor MCP disponible, podés crear el tuyo usando el SDK oficial:</p>
+        <table>
+          <thead><tr><th>SDK</th><th>Paquete</th></tr></thead>
+          <tbody>
+            <tr><td>TypeScript / JavaScript</td><td><code>@modelcontextprotocol/sdk</code></td></tr>
+            <tr><td>Python</td><td><code>mcp</code> (PyPI)</td></tr>
+          </tbody>
+        </table>
+        <p>La spec completa está en <strong>modelcontextprotocol.io</strong>. El SDK maneja el protocolo; vos solo definís qué tools, resources y prompts querés exponer.</p>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Un servidor MCP propio es la solución correcta cuando necesitás conectar Claude con sistemas internos: tu ERP, APIs privadas, bases de datos legacy o cualquier servicio que no tiene un servidor MCP público.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ SLASH COMMANDS ══ -->

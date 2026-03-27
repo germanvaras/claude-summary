@@ -1,0 +1,79 @@
+    <div class="section" id="section-tokens">
+      <div class="section-header"><h2>🪙 Tokens y Contexto <span class="badge">Fundamental</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Entender tokens y contexto es entender los límites reales de Claude. Todo lo demás — skills, CLAUDE.md, subagentes — existe en parte para gestionar este recurso finito.</div></div>
+
+        <h3>🔢 ¿Qué es un token?</h3>
+        <p>Un token es la unidad mínima que el modelo procesa. No es una palabra ni un carácter — es un fragmento que puede ser parte de una palabra, una palabra entera o un signo de puntuación. El tokenizer divide el texto antes de enviarlo al modelo.</p>
+        <table>
+          <thead><tr><th>Texto</th><th>Tokens aprox.</th><th>Nota</th></tr></thead>
+          <tbody>
+            <tr><td>Una línea de código simple</td><td>~10–20</td><td>Varía mucho por lenguaje</td></tr>
+            <tr><td>Un párrafo de texto</td><td>~100–150</td><td>—</td></tr>
+            <tr><td>Un CLAUDE.md de 500 palabras (inglés)</td><td>~700</td><td>En español: ~850–1.000 por mayor densidad de tokens</td></tr>
+            <tr><td>Un archivo de código de 300 líneas</td><td>~2.500–4.000</td><td>Depende de la densidad</td></tr>
+            <tr><td>Esta documentación completa</td><td>~15.000</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>El tokenizer de Claude está optimizado para inglés. El mismo texto en español o en otros idiomas generalmente consume <strong>más tokens</strong> que en inglés — es decir, es menos eficiente.</div></div>
+
+        <h3>📦 El context window</h3>
+        <p>El context window es el "espacio de trabajo" del modelo — todo lo que Claude puede "ver" a la vez: el historial de la conversación, archivos leídos, CLAUDE.md, skills activas y resultados de herramientas. <strong>Es finito.</strong> Todo comparte el mismo espacio.</p>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Los modelos actuales de Claude tienen distintos context windows: <strong>Opus 4.6 y Sonnet 4.6 tienen 1.000.000 tokens (1M)</strong>; <strong>Haiku 4.5 tiene 200.000 tokens</strong>. Este presupuesto cubre el historial, archivos, CLAUDE.md y skills (input) más la respuesta generada (output). En uso interactivo raramente es un problema. En pipelines con generación masiva, el límite de output por respuesta es el techo práctico real: <strong>Opus 4.6 hasta 128K tokens, Sonnet 4.6 y Haiku 4.5 hasta 64K tokens</strong>.</div></div>
+
+        <h3>🫧 ¿Qué pasa cuando el contexto se llena?</h3>
+        <p>Claude no te avisa con un error explícito — lo que pasa es más sutil y difícil de detectar:</p>
+
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Degradación gradual</h4>
+          <p>Claude empieza a perder el foco en instrucciones que estaban al principio de la conversación. CLAUDE.md puede quedar fuera del "foco efectivo" aunque técnicamente siga cargado. Las respuestas se vuelven más genéricas y menos precisas.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Pérdida de coherencia</h4>
+          <p>Claude empieza a contradecirse: aplica convenciones distintas a las establecidas, repite preguntas que ya respondiste, o ignora restricciones de CLAUDE.md que definiste al inicio de la sesión.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Corte forzado</h4>
+          <p>En casos extremos, la API rechaza la request porque supera el límite máximo. Aparece un error explícito. Es el caso menos frecuente.</p>
+        </div></div>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>El "olvido" de Claude en sesiones largas casi nunca es un bug del modelo — es el contexto cargado. Antes de asumir que Claude "no entiende", usá <code>/compact</code> para comprimir el historial, o iniciá una sesión nueva con solo <code>claude</code>. Usá <code>claude -c</code> solo si querés <em>retomar</em> la sesión anterior donde quedó — no es una sesión nueva.</div></div>
+
+        <h3>🗜️ /compact — la herramienta clave</h3>
+        <p>El comando <code>/compact</code> comprime el historial de la conversación: el modelo genera un resumen denso de lo que se habló y reemplaza el historial completo por ese resumen. El resultado: libera espacio de contexto sin perder el hilo de la tarea.</p>
+        <table>
+          <thead><tr><th></th><th><code>/compact</code></th><th>Sesión nueva</th></tr></thead>
+          <tbody>
+            <tr><td>Libera contexto</td><td>✅ Sí</td><td>✅ Sí</td></tr>
+            <tr><td>Mantiene el hilo de la tarea</td><td>✅ Sí (resumido)</td><td>❌ No</td></tr>
+            <tr><td>Mantiene CLAUDE.md y skills</td><td>✅ Sí</td><td>✅ Sí</td></tr>
+            <tr><td>Cuándo usarlo</td><td>Sesión larga con contexto acumulado</td><td>Tarea completamente nueva</td></tr>
+          </tbody>
+        </table>
+        <pre>/compact
+
+# También podés pasar instrucciones de foco:
+/compact focalizá en los cambios del módulo Orders</pre>
+
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>No esperés a que el contexto explote.</strong> Comprimí proactivamente cuando sientas que la sesión lleva rato y Claude empieza a perder foco — no como rescate de último momento.</div></div>
+
+        <h3>🏆 Estrategias para gestionar el contexto</h3>
+        <table>
+          <thead><tr><th>Estrategia</th><th>Cómo</th><th>Impacto</th></tr></thead>
+          <tbody>
+            <tr><td>📄 CLAUDE.md conciso</td><td>Menos de 200 líneas, sin relleno</td><td>Libera tokens en cada conversación</td></tr>
+            <tr><td>🧩 Progressive disclosure</td><td>Material extenso en <code>references/</code>, SKILL.md corto</td><td>Solo carga contexto cuando es necesario</td></tr>
+            <tr><td>🗜️ /compact proactivo</td><td>Comprimí antes de que el contexto se llene</td><td>Mantiene coherencia en sesiones largas</td></tr>
+            <tr><td>🤖 Subagentes</td><td>Delegá tareas independientes a contextos separados</td><td>El principal no acumula todo el trabajo</td></tr>
+            <tr><td>✂️ Sesiones cortas</td><td>Una sesión = un objetivo concreto</td><td>Evita acumulación innecesaria</td></tr>
+            <tr><td>📁 No leer de más</td><td>Dejá que Claude pida los archivos cuando los necesite</td><td>Cada Read consume tokens del contexto</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout ok"><span class="callout-icon">✅</span><div><strong>Regla de oro:</strong> El contexto es un recurso compartido entre vos, Claude y el proyecto. Gestionar bien CLAUDE.md, las skills y la duración de las sesiones es tan importante como escribir buen código.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ MODELOS ══ -->

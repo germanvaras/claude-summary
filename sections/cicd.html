@@ -1,0 +1,121 @@
+    <div class="section" id="section-cicd">
+      <div class="section-header"><h2>🔄 Claude Code en CI/CD <span class="badge">Automatización</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Claude Code tiene un modo headless (no interactivo) diseñado para pipelines de CI/CD y automatizaciones. Se ejecuta, completa la tarea y sale — sin sesión interactiva, con output estructurado.</div></div>
+
+        <h3>🚀 Modo headless — claude -p</h3>
+        <p>El flag <code>-p</code> (print / headless) envía un prompt, espera la respuesta completa y sale. No abre una sesión interactiva.</p>
+        <pre># Sintaxis básica
+claude -p "tarea que querés ejecutar"
+
+# Ejemplo: generar changelog automáticamente
+claude -p "generá el changelog para la versión 2.4.0 basándote en los commits desde el tag v2.3.0"
+
+# Ejemplo: revisar código antes de merge
+claude -p "revisá los archivos modificados en este PR y listá cualquier problema crítico"</pre>
+
+        <h3>📤 Formatos de output</h3>
+        <p>En modo headless podés controlar el formato de salida:</p>
+        <table>
+          <thead><tr><th>Flag</th><th>Formato</th><th>Cuándo usarlo</th></tr></thead>
+          <tbody>
+            <tr><td><code>--output-format text</code></td><td>Texto plano (por defecto)</td><td>Scripts que leen la salida como string</td></tr>
+            <tr><td><code>--output-format json</code></td><td>JSON con la respuesta completa al final</td><td>Integración con herramientas que parsean JSON</td></tr>
+            <tr><td><code>--output-format stream-json</code></td><td>Eventos JSON en streaming, uno por línea (NDJSON)</td><td>Procesar la respuesta en tiempo real mientras llega</td></tr>
+          </tbody>
+        </table>
+        <pre># Output JSON para parsing en scripts
+claude -p "listá las clases con cobertura bajo el 80%" --output-format json
+
+# Stream para procesar en tiempo real
+claude -p "refactorizá OrderService.cs" --output-format stream-json | jq '.content'</pre>
+
+        <h3>🔒 Autenticación en CI/CD</h3>
+        <p>En pipelines sin interfaz gráfica, el login por navegador no funciona. Siempre usá API key:</p>
+        <pre># GitHub Actions — secret configurado en el repositorio
+env:
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+# Docker
+docker run -e ANTHROPIC_API_KEY=sk-ant-... mi-imagen claude -p "tarea"
+
+# Variables de entorno en el sistema CI
+export ANTHROPIC_API_KEY="sk-ant-api03-..."
+claude -p "tarea"</pre>
+
+        <h3>⚙️ Flags importantes para CI/CD</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">--max-turns &lt;n&gt;</span></td><td class="cli-desc">Limita la cantidad de turnos agénticos. Evita que Claude entre en bucles infinitos. Recomendado: 10–30 dependiendo de la complejidad.</td></tr>
+          <tr><td><span class="cli-cmd">--dangerously-skip-permissions</span></td><td class="cli-desc">Omite todas las confirmaciones interactivas. Necesario en CI (no hay usuario para aprobar). Usá con reglas <code>deny</code> en settings.json como guardarraíl.</td></tr>
+          <tr><td><span class="cli-cmd">--allowedTools Read,Write,Bash</span></td><td class="cli-desc">Restringe qué herramientas puede usar Claude en esta ejecución. Principio de mínimo privilegio.</td></tr>
+          <tr><td><span class="cli-cmd">--disallowedTools Bash</span></td><td class="cli-desc">Bloquea herramientas específicas para esta ejecución.</td></tr>
+          <tr><td><span class="cli-cmd">--output-format json</span></td><td class="cli-desc">Salida en JSON — más fácil de parsear en scripts de CI.</td></tr>
+          <tr><td><span class="cli-cmd">--verbose</span></td><td class="cli-desc">Logging detallado turno a turno. Útil para debugging de pipelines.</td></tr>
+        </table>
+
+        <h3>📋 Ejemplo — GitHub Actions</h3>
+        <pre># .github/workflows/claude-review.yml
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run Claude review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "Revisá los archivos modificados en este PR. \
+            Listá problemas críticos, sugerencias de mejora y si hay tests faltantes. \
+            Formato: lista markdown con severidad [critical/suggestion/nitpick]." \
+            --max-turns 20 \
+            --allowedTools Read,Grep,Glob \
+            --output-format text</pre>
+
+        <h3>📋 Ejemplo — Script de automatización</h3>
+        <pre>#!/bin/bash
+# generate-release-notes.sh
+
+VERSION=$1
+PREV_VERSION=$2
+
+echo "Generando release notes para $VERSION..."
+
+NOTES=$(claude -p "Generá release notes para la versión $VERSION. \
+  Basate en los commits desde el tag $PREV_VERSION hasta HEAD. \
+  Agrupá por: Features, Bug Fixes, Breaking Changes. \
+  Formato Markdown." \
+  --max-turns 5 \
+  --output-format text)
+
+echo "$NOTES" > "RELEASE_NOTES_$VERSION.md"
+echo "Listo: RELEASE_NOTES_$VERSION.md"</pre>
+
+        <h3>🛡️ Buenas prácticas de seguridad en CI/CD</h3>
+        <table>
+          <thead><tr><th>Práctica</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Usá <code>--allowedTools</code> con mínimo privilegio</td><td>En CI, Claude no necesita todas las herramientas. Restringí a lo que realmente necesita la tarea.</td></tr>
+            <tr><td>Configurá <code>deny</code> rules en settings.json del proyecto</td><td>Las reglas deny funcionan incluso con <code>--dangerously-skip-permissions</code></td></tr>
+            <tr><td>Nunca hardcodees la API key en el código o en archivos commiteados</td><td>Usá secrets del CI (GitHub Secrets, etc.)</td></tr>
+            <tr><td>Usá <code>--max-turns</code> siempre en CI</td><td>Evita ejecuciones que no terminan y consumen créditos sin control</td></tr>
+            <tr><td>Revisá el exit code del proceso</td><td>Claude -p retorna 0 en éxito, distinto de 0 en error — usalo para controlar el pipeline</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout ok"><span class="callout-icon">✅</span><div><strong>Combinación ideal para CI/CD:</strong> <code>ANTHROPIC_API_KEY</code> en secret + <code>--dangerously-skip-permissions</code> + <code>--allowedTools</code> con mínimo privilegio + <code>--max-turns</code> como límite de seguridad + reglas <code>deny</code> en settings.json del proyecto.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ WORKTREES ══ -->

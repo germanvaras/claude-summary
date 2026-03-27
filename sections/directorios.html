@@ -1,0 +1,74 @@
+    <div class="section" id="section-directorios">
+      <div class="section-header"><h2>📁 Directorios <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Estructura de directorios de Claude Code: dónde vive cada archivo, qué alcance tiene y ejemplos reales.</div></div>
+        <h3>🏠 Configuración personal (global)</h3>
+        <pre class="dir-tree"><span class="dir">~/.claude/</span>
+├── <span class="file">CLAUDE.md</span>             <span class="note"># Instrucciones personales globales</span>
+├── <span class="file">settings.json</span>         <span class="note"># Configuración global (hooks, MCP, permisos)</span>
+├── <span class="dir">skills/</span>
+│   ├── <span class="dir">commit-message/</span>
+│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Skill personal: formato de commits</span>
+│   ├── <span class="dir">code-explain/</span>
+│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Skill personal: cómo explicar código</span>
+│   └── <span class="dir">debug-helper/</span>
+│       ├── <span class="file">SKILL.md</span>
+│       └── <span class="dir">references/</span>
+│           └── <span class="file">checklist.md</span>
+└── <span class="dir">commands/</span>
+    ├── <span class="file">standup.md</span>            <span class="note"># /standup</span>
+    └── <span class="file">changelog.md</span>          <span class="note"># /changelog</span></pre>
+        <h3>🏢 Configuración de proyecto</h3>
+        <pre class="dir-tree"><span class="dir">mi-proyecto/</span>
+├── <span class="file">CLAUDE.md</span>                  <span class="note"># Instrucciones del proyecto</span>
+├── <span class="dir">.claude/</span>
+│   ├── <span class="file">settings.json</span>          <span class="note"># Hooks y MCP del proyecto</span>
+│   ├── <span class="dir">skills/</span>
+│   │   ├── <span class="dir">pr-review/</span>
+│   │   │   ├── <span class="file">SKILL.md</span>
+│   │   │   └── <span class="dir">references/</span>
+│   │   │       └── <span class="file">review-guide.md</span>
+│   │   └── <span class="dir">api-design/</span>
+│   │       ├── <span class="file">SKILL.md</span>
+│   │       └── <span class="dir">scripts/</span>
+│   │           └── <span class="file">validate-openapi.sh</span>
+│   └── <span class="dir">commands/</span>
+│       ├── <span class="file">release.md</span>
+│       └── <span class="file">audit.md</span>
+└── <span class="dir">src/</span>
+    ├── <span class="file">CLAUDE.md</span>              <span class="note"># Instrucciones del módulo src/</span>
+    └── <span class="note">...</span></pre>
+        <h3>⚙️ Anatomía de settings.json</h3>
+        <pre>{
+  "permissions": {
+    "allow": ["Read", "Bash(git *)", "Bash(npm run *)"],
+    "deny":  ["Bash(rm -rf *)"]
+  },
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "npm run lint" }] }
+    ]
+  },
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "ghp_..." }
+    }
+  }
+}</pre>
+        <h3>📐 Precedencia</h3>
+        <table>
+          <thead><tr><th>Nivel</th><th>Archivo</th><th>Prevalece sobre…</th></tr></thead>
+          <tbody>
+            <tr><td>🏢 Managed</td><td>Configuración central de la org</td><td>Todo — no puede ser anulada</td></tr>
+            <tr><td>🔒 Local</td><td><code>.claude/settings.local.json</code></td><td>Project y User</td></tr>
+            <tr><td>📁 Project</td><td><code>.claude/settings.json</code></td><td>User</td></tr>
+            <tr><td>👤 User</td><td><code>~/.claude/settings.json</code></td><td>Nada (menor prioridad)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ SETUP ══ -->

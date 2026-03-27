@@ -1,0 +1,237 @@
+    <div class="section" id="section-quiz">
+      <div class="section-header"><h2>🎯 Quiz <span class="badge">Poné a prueba lo que aprendiste</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div>24 preguntas sobre todo lo que cubre esta documentación. Sin trampa, sin curva de aprendizaje — si leíste, sabés. Si no leíste... bueno, los resultados van a hablar por vos.</div></div>
+
+        <div class="quiz-wrap" id="quiz-wrap">
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">1. ¿Cuál es la diferencia principal entre una Skill y CLAUDE.md?</div>
+            <div class="quiz-option" data-val="a">A) CLAUDE.md es para proyectos, las skills son personales</div>
+            <div class="quiz-option" data-val="b">B) CLAUDE.md carga siempre; las skills cargan solo cuando el contexto coincide semánticamente</div>
+            <div class="quiz-option" data-val="c">C) Las skills son más rápidas que CLAUDE.md</div>
+            <div class="quiz-option" data-val="d">D) No hay diferencia, son lo mismo con distinto nombre</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">2. ¿Dónde debe estar ubicado el archivo de una skill de proyecto para que el equipo la comparta?</div>
+            <div class="quiz-option" data-val="a">A) <code>~/.claude/skills/nombre/SKILL.md</code></div>
+            <div class="quiz-option" data-val="b">B) <code>./skills/nombre/SKILL.md</code></div>
+            <div class="quiz-option" data-val="c">C) <code>.claude/skills/nombre/SKILL.md</code></div>
+            <div class="quiz-option" data-val="d">D) <code>./SKILL.md</code> en la raíz del proyecto</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="a">
+            <div class="q-text">3. Si tenés una skill personal y una skill de proyecto con el mismo nombre, ¿cuál gana?</div>
+            <div class="quiz-option" data-val="a">A) La personal, porque tiene mayor prioridad que la de proyecto</div>
+            <div class="quiz-option" data-val="b">B) La de proyecto, porque está más cerca del código</div>
+            <div class="quiz-option" data-val="c">C) La que se creó primero</div>
+            <div class="quiz-option" data-val="d">D) Se activan las dos al mismo tiempo</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="d">
+            <div class="q-text">4. ¿Para qué sirve el campo <code>allowed-tools</code> en el frontmatter de una skill?</div>
+            <div class="quiz-option" data-val="a">A) Define qué comandos slash puede usar el usuario mientras la skill está activa</div>
+            <div class="quiz-option" data-val="b">B) Lista los MCP servers permitidos durante la skill</div>
+            <div class="quiz-option" data-val="c">C) Especifica en qué proyectos puede usarse la skill</div>
+            <div class="quiz-option" data-val="d">D) Restringe qué herramientas nativas puede usar Claude cuando la skill está activa</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">5. Querés que cada vez que Claude edite un archivo, se ejecute el linter automáticamente. ¿Qué usás?</div>
+            <div class="quiz-option" data-val="a">A) Un slash command <code>/lint</code> que el equipo invoca manualmente</div>
+            <div class="quiz-option" data-val="b">B) Un hook <code>PostToolUse</code> con matcher <code>Write|Edit</code></div>
+            <div class="quiz-option" data-val="c">C) Una skill que incluye el paso de lint en sus instrucciones</div>
+            <div class="quiz-option" data-val="d">D) Una entrada en CLAUDE.md que le pide a Claude que siempre lintee</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">6. ¿Qué hace el comando <code>/compact</code> dentro de una sesión de Claude Code?</div>
+            <div class="quiz-option" data-val="a">A) Comprime los archivos del proyecto para que ocupen menos espacio</div>
+            <div class="quiz-option" data-val="b">B) Elimina todas las skills cargadas para liberar memoria</div>
+            <div class="quiz-option" data-val="c">C) Comprime el historial de la conversación generando un resumen, para liberar espacio en el contexto</div>
+            <div class="quiz-option" data-val="d">D) Combina múltiples CLAUDE.md en uno solo</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="a">
+            <div class="q-text">7. ¿Cuál es la diferencia entre un Agente y un Subagente en Claude Code?</div>
+            <div class="quiz-option" data-val="a">A) El subagente corre en un contexto aislado y recibe trabajo delegado del agente principal</div>
+            <div class="quiz-option" data-val="b">B) El subagente es más pequeño y usa menos tokens</div>
+            <div class="quiz-option" data-val="c">C) No hay diferencia, son sinónimos</div>
+            <div class="quiz-option" data-val="d">D) El subagente solo puede leer archivos, nunca escribirlos</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="d">
+            <div class="q-text">8. En MCP, ¿qué son los "Tools"?</div>
+            <div class="quiz-option" data-val="a">A) Las herramientas nativas de Claude Code como Read, Write y Bash</div>
+            <div class="quiz-option" data-val="b">B) Los archivos de configuración del servidor MCP</div>
+            <div class="quiz-option" data-val="c">C) Los scripts en la carpeta <code>scripts/</code> de una skill</div>
+            <div class="quiz-option" data-val="d">D) Funciones que expone el servidor MCP y que Claude puede invocar</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">9. ¿Para qué tipo de tarea es más adecuado un slash command vs una skill?</div>
+            <div class="quiz-option" data-val="a">A) El slash command es mejor para tareas que requieren razonamiento complejo</div>
+            <div class="quiz-option" data-val="b">B) El slash command es mejor para acciones puntuales que el usuario quiere controlar manualmente, como generar un changelog</div>
+            <div class="quiz-option" data-val="c">C) El slash command es mejor para reglas que deben aplicarse siempre</div>
+            <div class="quiz-option" data-val="d">D) El slash command es mejor cuando la tarea involucra múltiples archivos</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">10. Acabás de crear una nueva skill. La buscás con <code>/skills</code> y no aparece. ¿Cuál es lo primero que deberías hacer?</div>
+            <div class="quiz-option" data-val="a">A) Reinstalar Claude Code</div>
+            <div class="quiz-option" data-val="b">B) Verificar que tenés conexión a internet</div>
+            <div class="quiz-option" data-val="c">C) Cerrar la sesión con <code>/exit</code> y volver a abrir — las skills se cargan al inicio</div>
+            <div class="quiz-option" data-val="d">D) Mover el archivo a la raíz del proyecto</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">11. ¿Cuál es el tamaño del context window de los modelos Claude actuales (Opus, Sonnet, Haiku)?</div>
+            <div class="quiz-option" data-val="a">A) Varía según el modelo: Opus tiene más que Sonnet y Haiku</div>
+            <div class="quiz-option" data-val="b">B) 200.000 tokens para todos los modelos actuales</div>
+            <div class="quiz-option" data-val="c">C) 100.000 tokens en total</div>
+            <div class="quiz-option" data-val="d">D) Depende del plan: Pro tiene más que Free</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">12. En una sesión larga, Claude empieza a aplicar convenciones distintas a las que definiste en CLAUDE.md. ¿Cuál es la causa más probable?</div>
+            <div class="quiz-option" data-val="a">A) CLAUDE.md tiene un error de sintaxis</div>
+            <div class="quiz-option" data-val="b">B) La skill activa está sobreescribiendo CLAUDE.md</div>
+            <div class="quiz-option" data-val="c">C) El contexto se está llenando y Claude pierde el foco en instrucciones tempranas</div>
+            <div class="quiz-option" data-val="d">D) Claude Code necesita ser actualizado</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="a">
+            <div class="q-text">13. Para el desarrollo diario de código — debugging, PR review, features — ¿qué modelo es el recomendado por defecto en Claude Code?</div>
+            <div class="quiz-option" data-val="a">A) Claude Sonnet 4.6 — balance ideal de calidad, velocidad y costo</div>
+            <div class="quiz-option" data-val="b">B) Claude Opus 4.6 — siempre el más inteligente es mejor</div>
+            <div class="quiz-option" data-val="c">C) Claude Haiku 4.5 — es el más rápido</div>
+            <div class="quiz-option" data-val="d">D) No importa, todos dan el mismo resultado en código</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="d">
+            <div class="q-text">14. ¿En qué escenario tiene más sentido usar Claude Opus en lugar de Sonnet?</div>
+            <div class="quiz-option" data-val="a">A) Cuando la sesión va a ser muy larga y hay mucho contexto</div>
+            <div class="quiz-option" data-val="b">B) Para tareas repetitivas como formateo y renombrado de variables</div>
+            <div class="quiz-option" data-val="c">C) Cuando se necesita respuesta rápida y el costo no importa</div>
+            <div class="quiz-option" data-val="d">D) Para decisiones críticas de alto impacto: arquitectura, análisis de seguridad, refactoring complejo</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">15. Configurás <code>"deny": ["Bash(rm -rf *)"]</code> en settings.json. ¿Qué sucede cuando Claude intenta ejecutar ese comando?</div>
+            <div class="quiz-option" data-val="a">A) Claude te pide confirmación antes de ejecutarlo</div>
+            <div class="quiz-option" data-val="b">B) Claude no puede ejecutarlo bajo ninguna circunstancia — la acción está bloqueada, incluso en modo auto</div>
+            <div class="quiz-option" data-val="c">C) Claude lo ejecuta pero registra un log de advertencia</div>
+            <div class="quiz-option" data-val="d">D) Claude te pregunta si querés cambiar la regla deny por allow</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">16. Un desarrollador tiene configuración en <code>.claude/settings.json</code> (Project) y también en <code>.claude/settings.local.json</code> (Local). Ambos definen una regla distinta para el mismo permiso. ¿Cuál prevalece?</div>
+            <div class="quiz-option" data-val="a">A) La de Project (<code>settings.json</code>), porque es la configuración del equipo</div>
+            <div class="quiz-option" data-val="b">B) Ninguna — hay un conflicto que Claude Code reporta como error</div>
+            <div class="quiz-option" data-val="c">C) La de Local (<code>settings.local.json</code>), porque Local tiene mayor prioridad que Project</div>
+            <div class="quiz-option" data-val="d">D) La última que fue modificada en el sistema de archivos</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="a">
+            <div class="q-text">17. Arrancás en un proyecto que ya tiene código pero no tiene CLAUDE.md. ¿Cuál es la forma más rápida de generar uno adecuado al proyecto?</div>
+            <div class="quiz-option" data-val="a">A) Ejecutar <code>/init</code> — analiza el repositorio y propone un CLAUDE.md con el stack y convenciones detectadas</div>
+            <div class="quiz-option" data-val="b">B) Copiar el CLAUDE.md de otro proyecto y editarlo manualmente</div>
+            <div class="quiz-option" data-val="c">C) Crear un archivo vacío llamado CLAUDE.md en la raíz</div>
+            <div class="quiz-option" data-val="d">D) Pedirle a Claude que "recuerde el proyecto" en el primer mensaje</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">18. Necesitás que Claude Code corra en un pipeline de CI/CD sin interfaz gráfica. ¿Cómo autenticás Claude Code en ese entorno?</div>
+            <div class="quiz-option" data-val="a">A) Guardás las credenciales del browser en el servidor de CI</div>
+            <div class="quiz-option" data-val="b">B) Configurás la variable de entorno <code>ANTHROPIC_API_KEY</code> con una API key de Anthropic Console</div>
+            <div class="quiz-option" data-val="c">C) Ejecutás <code>claude login</code> antes de cada pipeline</div>
+            <div class="quiz-option" data-val="d">D) No es posible usar Claude Code en CI/CD</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">19. ¿Qué flag usás para ejecutar Claude Code en modo headless (sin sesión interactiva) y que salga al terminar la tarea?</div>
+            <div class="quiz-option" data-val="a">A) <code>claude --auto</code></div>
+            <div class="quiz-option" data-val="b">B) <code>claude --headless</code></div>
+            <div class="quiz-option" data-val="c">C) <code>claude -p "tarea"</code></div>
+            <div class="quiz-option" data-val="d">D) <code>claude --exit-when-done</code></div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="d">
+            <div class="q-text">20. Un servidor MCP configurado con transporte <code>stdio</code> — ¿cómo se comunica con Claude Code?</div>
+            <div class="quiz-option" data-val="a">A) Via HTTP REST sobre localhost</div>
+            <div class="quiz-option" data-val="b">B) Via WebSocket</div>
+            <div class="quiz-option" data-val="c">C) Leyendo y escribiendo archivos en un directorio compartido</div>
+            <div class="quiz-option" data-val="d">D) Claude Code lanza el servidor como proceso hijo y se comunican por stdin/stdout (JSON-RPC)</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">21. Instalaste Claude Code con <code>npm install -g @anthropic-ai/claude-code</code> pero al escribir <code>claude</code> en PowerShell aparece "comando no reconocido". ¿Cuál es la causa más probable?</div>
+            <div class="quiz-option" data-val="a">A) El instalador falló — reinstalá con el script oficial de PowerShell</div>
+            <div class="quiz-option" data-val="b">B) El PATH del sistema no incluye <code>%APPDATA%\npm</code> — cerrá y reabrí la terminal para que se recargue</div>
+            <div class="quiz-option" data-val="c">C) Node.js no está instalado correctamente</div>
+            <div class="quiz-option" data-val="d">D) Necesitás ejecutar PowerShell como administrador para reconocer el comando</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">22. Usás Claude Code en tu máquina personal de forma interactiva. ¿Cuál es el método de autenticación recomendado y dónde se guarda la sesión?</div>
+            <div class="quiz-option" data-val="a">A) API key guardada en <code>settings.json</code> del proyecto</div>
+            <div class="quiz-option" data-val="b">B) Login por navegador — el token se guarda automáticamente en <code>~/.claude/credentials.json</code></div>
+            <div class="quiz-option" data-val="c">C) Variable de entorno <code>ANTHROPIC_API_KEY</code> configurada en el sistema</div>
+            <div class="quiz-option" data-val="d">D) No es necesario autenticarse en uso local</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="b">
+            <div class="q-text">23. Cerraste Claude Code a mitad de una tarea. ¿Qué comandos te permiten retomar exactamente donde quedaste?</div>
+            <div class="quiz-option" data-val="a">A) <code>claude --restart</code> para cualquier sesión anterior</div>
+            <div class="quiz-option" data-val="b">B) <code>claude -c</code> para retomar la última sesión, o <code>claude -r &lt;session-id&gt;</code> para una sesión específica</div>
+            <div class="quiz-option" data-val="c">C) <code>claude --recover</code> — detecta la sesión interrumpida automáticamente</div>
+            <div class="quiz-option" data-val="d">D) No es posible — las sesiones no persisten al cerrar Claude Code</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">24. Querés que Claude realice un refactoring grande y riesgoso sin tocar tu directorio de trabajo actual. ¿Qué flag usás al iniciar Claude Code?</div>
+            <div class="quiz-option" data-val="a">A) <code>claude --sandbox</code></div>
+            <div class="quiz-option" data-val="b">B) <code>claude --branch</code></div>
+            <div class="quiz-option" data-val="c">C) <code>claude --worktree</code> — Claude trabaja en una copia Git aislada, tu directorio no se modifica</div>
+            <div class="quiz-option" data-val="d">D) <code>claude --dry-run</code></div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <button class="quiz-btn" id="quiz-submit" onclick="submitQuiz()">Ver resultado 🎯</button>
+
+          <div class="quiz-result" id="quiz-result">
+            <div id="result-emoji" style="font-size:2.5rem;margin-bottom:8px"></div>
+            <div class="quiz-score" id="result-score"></div>
+            <div class="quiz-verdict" id="result-verdict"></div>
+            <div class="quiz-msg" id="result-msg"></div>
+            <button class="quiz-restart" onclick="restartQuiz()">🔄 Intentar de nuevo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-results" id="no-results">😕 No se encontraron resultados para tu búsqueda.</div>

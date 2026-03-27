@@ -1,0 +1,61 @@
+    <div class="section" id="section-modelos">
+      <div class="section-header"><h2>🤖 Modelos <span class="badge">Referencia</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Idea clave:</strong> Elegir el modelo correcto impacta velocidad, calidad y costo. La regla general: Opus para lo complejo y crítico, Sonnet para el desarrollo diario, Haiku para tareas simples y rápidas.</div></div>
+
+        <h3>📊 Comparación de modelos</h3>
+        <table>
+          <thead><tr><th>Modelo</th><th>Inteligencia</th><th>Velocidad</th><th>Costo</th><th>Context window</th></tr></thead>
+          <tbody>
+            <tr><td>🟣 <strong>Claude Opus 4.6</strong></td><td>⭐⭐⭐⭐⭐ Máxima</td><td>🐢 Más lento</td><td>💰💰💰 Mayor</td><td>1M tokens · output máx: 128K</td></tr>
+            <tr><td>🔵 <strong>Claude Sonnet 4.6</strong></td><td>⭐⭐⭐⭐ Muy alta</td><td>⚡ Rápido</td><td>💰💰 Medio</td><td>1M tokens · output máx: 64K</td></tr>
+            <tr><td>🟢 <strong>Claude Haiku 4.5</strong></td><td>⭐⭐⭐ Capaz y eficiente</td><td>🚀 Más rápido</td><td>💰 Menor</td><td>200K tokens · output máx: 64K</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🎯 ¿Cuándo usar cada uno?</h3>
+        <table>
+          <thead><tr><th>Tarea</th><th>Modelo recomendado</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Refactoring complejo, arquitectura, decisiones de diseño</td><td>🟣 Opus 4.6</td><td>Máxima capacidad para decisiones críticas</td></tr>
+            <tr><td>Desarrollo diario: coding, PR review, debugging</td><td>🔵 Sonnet 4.6</td><td>Balance ideal calidad / velocidad / costo</td></tr>
+            <tr><td>Análisis de código crítico (seguridad, migración)</td><td>🟣 Opus 4.6</td><td>No arriesgues calidad en tareas de alto impacto</td></tr>
+            <tr><td>Agente en pipelines CI/CD</td><td>🔵 Sonnet 4.6</td><td>Modelo default de Claude Code, probado para agentes</td></tr>
+            <tr><td>Tareas repetitivas: formateo, renames, boilerplate</td><td>🟢 Haiku 4.5</td><td>No hace falta potencia máxima para esto</td></tr>
+            <tr><td>Preguntas rápidas, lookups, snippets simples</td><td>🟢 Haiku 4.5</td><td>Velocidad y costo mínimo</td></tr>
+          </tbody>
+        </table>
+
+        <h3>⚙️ Cómo cambiar el modelo</h3>
+        <p>El modelo por defecto en Claude Code es <strong>Sonnet</strong>. Podés cambiarlo de varias formas:</p>
+        <table>
+          <thead><tr><th>Método</th><th>Comando</th><th>Alcance</th></tr></thead>
+          <tbody>
+            <tr><td>Durante la sesión</td><td><code>/model claude-opus-4-6</code></td><td>Solo esa sesión</td></tr>
+            <tr><td>Al iniciar</td><td><code>claude --model claude-opus-4-6</code></td><td>Solo esa sesión</td></tr>
+            <tr><td>En settings.json</td><td><code>"model": "claude-sonnet-4-6"</code></td><td>Permanente (User o Project scope)</td></tr>
+            <tr><td>En frontmatter de skill</td><td><code>model: claude-haiku-4-5-20251001</code></td><td>Solo cuando esa skill está activa</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>IDs exactos de modelo: <code>claude-opus-4-6</code> · <code>claude-sonnet-4-6</code> · <code>claude-haiku-4-5-20251001</code>. Usá el ID completo en configuración para evitar ambigüedad.</div></div>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Haiku es versión <strong>4.5</strong>, no 4.6 — no son todos de la misma generación. El sufijo de fecha en <code>claude-haiku-4-5-20251001</code> es parte del ID oficial y es obligatorio. Usar <code>claude-haiku-4-5</code> sin la fecha o intentar <code>claude-haiku-4-6</code> puede fallar silenciosamente o hacer fallback al modelo por defecto.</div></div>
+
+        <h3>💰 Tokens y costo en la práctica</h3>
+        <p>En Claude Code, el costo se mide en tokens consumidos — tanto de entrada (historial, archivos, skills, CLAUDE.md) como de salida (lo que Claude genera). Cuanto más compleja la tarea y más contexto acumulado, más tokens consume cada turno.</p>
+        <div class="callout info"><span class="callout-icon">📌</span><div><strong>Input y output no tienen el mismo precio.</strong> Los tokens de salida cuestan significativamente más por token que los de entrada. En pipelines donde Claude genera respuestas largas (reportes, código extenso, análisis), el costo real está dominado por el output — no por el contexto de entrada. Optimizá también el tamaño de las respuestas, no solo el contexto.</div></div>
+        <table>
+          <thead><tr><th>Escenario</th><th>Modelo ideal</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Sesión interactiva de desarrollo</td><td>Sonnet</td><td>Muchos turnos → costo acumulado importa</td></tr>
+            <tr><td>Una tarea crítica puntual (arquitectura, seguridad)</td><td>Opus</td><td>Pocos turnos → el costo extra se justifica</td></tr>
+            <tr><td>Agente autónomo en pipeline CI/CD</td><td>Sonnet</td><td>Muchos turnos autónomos con intervención mínima</td></tr>
+            <tr><td>Tareas repetitivas: formateo, renames, boilerplate</td><td>Haiku</td><td>No hace falta potencia máxima → costo mínimo</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div><strong>No uses Opus para todo.</strong> Una sesión de refactoring masivo con Opus puede costar 10–20× más que con Sonnet para un resultado similar en tareas estándar. Reservá Opus para cuando realmente importa la máxima inteligencia.</div></div>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div>Para más detalle sobre gestión de sesiones, comandos de resume y buenas prácticas, ver la sección <strong>Sesiones</strong>.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ SKILLS ══ -->
