@@ -78,6 +78,33 @@ function initUI() {
     document.getElementById('no-results').style.display = any ? 'none' : 'block';
   });
 
+  // MOBILE NAV
+  const menuToggle = document.getElementById('menu-toggle');
+  const navEl      = document.getElementById('main-nav');
+  const navOverlay = document.getElementById('nav-overlay');
+
+  function openNav() {
+    navEl.classList.add('open');
+    navOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    menuToggle.setAttribute('aria-expanded', 'true');
+  }
+  function closeNav() {
+    navEl.classList.remove('open');
+    navOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  if (menuToggle) menuToggle.addEventListener('click', () => {
+    navEl.classList.contains('open') ? closeNav() : openNav();
+  });
+  if (navOverlay) navOverlay.addEventListener('click', closeNav);
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => { if (window.innerWidth <= 768) closeNav(); });
+  });
+
   // TROUBLESHOOTING ACCORDION
   window.toggleTrouble = function(header) {
     const body = header.nextElementSibling;

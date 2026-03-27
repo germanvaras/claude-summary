@@ -17,11 +17,15 @@
     <div class="search-wrap">
       <input type="text" id="search" placeholder="🔍  Buscar en la documentación...">
     </div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-nav">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
 <div class="layout">
-  <nav>
+  <div class="nav-overlay" id="nav-overlay"></div>
+  <nav id="main-nav" aria-label="Navegación principal">
     <ul id="nav-list">
       <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Inicio</li>
       <li><a class="nav-link active" data-section="disclaimer"    href="#"><span>⚠️</span> Antes de empezar</a></li>
