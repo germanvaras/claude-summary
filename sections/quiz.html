@@ -1,7 +1,7 @@
     <div class="section" id="section-quiz">
       <div class="section-header"><h2>🎯 Quiz <span class="badge">Poné a prueba lo que aprendiste</span></h2></div>
       <div class="content">
-        <div class="callout tip"><span class="callout-icon">💡</span><div>24 preguntas sobre todo lo que cubre esta documentación. Sin trampa, sin curva de aprendizaje — si leíste, sabés. Si no leíste... bueno, los resultados van a hablar por vos.</div></div>
+        <div class="callout tip"><span class="callout-icon">💡</span><div>25 preguntas sobre todo lo que cubre esta documentación. Sin trampa, sin curva de aprendizaje — si leíste, sabés. Si no leíste... bueno, los resultados van a hablar por vos.</div></div>
 
         <div class="quiz-wrap" id="quiz-wrap">
 
@@ -209,6 +209,15 @@
             <div class="quiz-option" data-val="b">B) <code>claude -c</code> para retomar la última sesión, o <code>claude -r &lt;session-id&gt;</code> para una sesión específica</div>
             <div class="quiz-option" data-val="c">C) <code>claude --recover</code> — detecta la sesión interrumpida automáticamente</div>
             <div class="quiz-option" data-val="d">D) No es posible — las sesiones no persisten al cerrar Claude Code</div>
+            <div class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-q" data-correct="c">
+            <div class="q-text">25. Querés iniciar una sesión que puedas identificar fácilmente después sin depender del ID autogenerado. ¿Qué flag usás?</div>
+            <div class="quiz-option" data-val="a">A) <code>claude --tag mi-tarea</code></div>
+            <div class="quiz-option" data-val="b">B) <code>claude --label mi-tarea</code></div>
+            <div class="quiz-option" data-val="c">C) <code>claude -n mi-tarea</code> o <code>claude --session-name mi-tarea</code></div>
+            <div class="quiz-option" data-val="d">D) No es posible nombrar sesiones — solo se identifican por ID</div>
             <div class="quiz-feedback"></div>
           </div>
 

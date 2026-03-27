@@ -10,6 +10,7 @@
             <tr><td><code>claude</code></td><td>Inicia una sesión nueva con contexto limpio</td><td>Cada vez que empezás una tarea nueva</td></tr>
             <tr><td><code>claude -c</code><br><code>claude --continue</code></td><td>Retoma la última sesión activa desde donde quedó</td><td>Querés seguir con lo que estabas haciendo</td></tr>
             <tr><td><code>claude -r &lt;session-id&gt;</code><br><code>claude --resume &lt;session-id&gt;</code></td><td>Retoma una sesión específica por su ID</td><td>Querés volver a una tarea anterior, no la última</td></tr>
+            <tr><td><code>claude -n &lt;nombre&gt;</code><br><code>claude --session-name &lt;nombre&gt;</code></td><td>Inicia una sesión nueva con un nombre personalizado</td><td>Querés identificar la sesión fácilmente sin depender del ID autogenerado</td></tr>
           </tbody>
         </table>
 
@@ -31,8 +32,9 @@
         </div></div>
 
         <div class="step"><div class="step-num">3</div><div class="step-body">
-          <h4>Retomá con el ID</h4>
-          <pre>claude --resume abc123def</pre>
+          <h4>Retomá con el ID o el nombre</h4>
+          <pre>claude --resume abc123def       # por ID autogenerado
+claude --resume mi-tarea        # por nombre asignado con -n</pre>
           <p>Claude carga el historial completo de esa sesión y continúa como si no hubiera habido interrupción.</p>
         </div></div>
 
