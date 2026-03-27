@@ -84,6 +84,9 @@ function initUI() {
   const navOverlay = document.getElementById('nav-overlay');
 
   function openNav() {
+    const headerH = document.querySelector('header').offsetHeight;
+    navEl.style.top = headerH + 'px';
+    navEl.style.height = (window.innerHeight - headerH) + 'px';
     navEl.classList.add('open');
     navOverlay.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -93,6 +96,8 @@ function initUI() {
     navEl.classList.remove('open');
     navOverlay.classList.remove('open');
     document.body.style.overflow = '';
+    navEl.style.height = '';
+    navEl.style.top = '';
     menuToggle.setAttribute('aria-expanded', 'false');
   }
 
