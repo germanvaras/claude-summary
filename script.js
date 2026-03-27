@@ -125,9 +125,11 @@ function initUI() {
     opt.addEventListener('click', function() {
       const q = this.closest('.quiz-q');
       const idx = [...document.querySelectorAll('.quiz-q')].indexOf(q);
-      if (answered[idx] !== undefined) return;
+      // Si la pregunta ya fue corregida (post-submit), no permitir cambios
+      if (q.dataset.locked) return;
+      // Actualizar selección — quitar selected de todas y poner en la clickeada
       answered[idx] = this.dataset.val;
-      q.querySelectorAll('.quiz-option').forEach(o => o.classList.add('disabled'));
+      q.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
       this.classList.add('selected');
     });
   });
@@ -138,6 +140,7 @@ function initUI() {
     qs.forEach((q, i) => {
       const correct = q.dataset.correct;
       const chosen  = answered[i];
+      q.dataset.locked = 'true';
       q.querySelectorAll('.quiz-option').forEach(o => o.classList.add('disabled'));
       q.querySelectorAll('.quiz-option').forEach(o => {
         if (o.dataset.val === correct) o.classList.add('correct');
@@ -184,6 +187,7 @@ function initUI() {
 
   window.restartQuiz = function() {
     answered = {};
+    document.querySelectorAll('.quiz-q').forEach(q => delete q.dataset.locked);
     document.querySelectorAll('.quiz-option').forEach(o => {
       o.classList.remove('selected','correct','wrong','disabled');
     });

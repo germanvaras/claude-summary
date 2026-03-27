@@ -2,7 +2,9 @@
   :root {
     --bg: #F2F2F2; --black: #000; --violet: #A100FF; --plum: #350058;
     --text: #1a1a1a; --white: #FFF; --sidebar-w: 240px;
+    --header-h: 88px;
   }
+  html { scroll-padding-top: var(--header-h); }
   body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
   header { background: var(--black); color: var(--white); padding: 28px 32px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.4); }
   .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
@@ -19,17 +21,17 @@
   nav ul li a { display: flex; align-items: center; gap: 10px; padding: 11px 24px; color: #ccc; text-decoration: none; font-size: 0.88rem; font-weight: 500; border-left: 3px solid transparent; transition: all .18s; cursor: pointer; }
   nav ul li a:hover { color: var(--white); background: rgba(161,0,255,0.12); border-left-color: var(--violet); }
   nav ul li a.active { color: var(--white); background: rgba(161,0,255,0.2); border-left-color: var(--violet); }
-  main { flex: 1; padding: 36px 40px; max-width: 960px; }
+  main { flex: 1; min-width: 0; padding: 36px 40px; max-width: 960px; }
   .section { display: none; }
   .section.active { display: block; }
   .section-header { border-bottom: 2px solid var(--violet); padding-bottom: 12px; margin-bottom: 28px; }
-  .section-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--plum); }
+  .section-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--plum); overflow-wrap: break-word; word-break: break-word; }
   .section-header .badge { display: inline-block; background: var(--violet); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 2px 10px; border-radius: 20px; margin-left: 10px; vertical-align: middle; letter-spacing: .04em; }
   .content p { line-height: 1.75; margin-bottom: 16px; font-size: 0.95rem; }
   .content h3 { font-size: 1.05rem; font-weight: 700; color: var(--plum); margin: 28px 0 10px; }
   .content ul, .content ol { padding-left: 20px; margin-bottom: 16px; }
   .content ul li, .content ol li { margin-bottom: 8px; line-height: 1.65; font-size: 0.93rem; }
-  pre { background: var(--plum); color: var(--bg); border-left: 4px solid var(--violet); border-radius: 8px; padding: 18px 20px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6; margin: 16px 0 24px; white-space: pre; }
+  pre { background: var(--plum); color: var(--bg); border-left: 4px solid var(--violet); border-radius: 8px; padding: 18px 20px; overflow-x: auto; max-width: 100%; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6; margin: 16px 0 24px; white-space: pre; }
   code { background: rgba(161,0,255,0.1); color: var(--plum); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; }
   pre code { background: none; color: inherit; padding: 0; }
   .callout { border-radius: 8px; padding: 14px 18px; margin: 18px 0; font-size: 0.91rem; line-height: 1.65; display: flex; gap: 12px; align-items: flex-start; }
@@ -44,7 +46,7 @@
   td { padding: 10px 14px; border-bottom: 1px solid #ddd; vertical-align: top; }
   tr:nth-child(even) td { background: #eaeaea; }
   tr:hover td { background: #e0d0f5; }
-  .dir-tree { background: var(--plum); color: var(--bg); border-left: 4px solid var(--violet); border-radius: 8px; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.8; margin: 16px 0 24px; white-space: pre; overflow-x: auto; display: block; }
+  .dir-tree { background: var(--plum); color: var(--bg); border-left: 4px solid var(--violet); border-radius: 8px; padding: 20px 24px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.8; margin: 16px 0 24px; white-space: pre; overflow-x: auto; max-width: 100%; display: block; }
   .dir-tree .dir  { color: #c9a0ff; font-weight: bold; }
   .dir-tree .file { color: #f2f2f2; }
   .dir-tree .note { color: #aaa; font-style: italic; }
@@ -58,7 +60,7 @@
   .cli-desc { color: #333; line-height: 1.5; }
   .step { display: flex; gap: 16px; margin-bottom: 28px; align-items: flex-start; }
   .step-num { background: var(--violet); color: #fff; font-weight: 700; font-size: 0.85rem; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-  .step-body { flex: 1; }
+  .step-body { flex: 1; min-width: 0; }
   .step-body h4 { font-size: 0.97rem; font-weight: 700; color: var(--plum); margin-bottom: 6px; }
   .step-body p  { font-size: 0.91rem; line-height: 1.65; margin-bottom: 8px; }
 
@@ -184,21 +186,32 @@
     main { padding: 20px 14px; }
     .section-header h2 { font-size: 1.2rem; }
 
-    /* Tables — horizontal scroll */
-    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
-    th, td { white-space: normal; }
+    /* Evitar scroll horizontal en la página */
+    html { overflow-x: hidden; }
 
-    /* CLI commands — allow wrap */
-    .cli-cmd { white-space: normal; word-break: break-all; }
+    /* Tables — scroll horizontal contenido en la tabla, no en la página */
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+    /* Solo los th sin wrap — los td pueden wrappear para no forzar tablas excesivamente anchas */
+    th { white-space: nowrap; }
+    td { white-space: normal; overflow-wrap: break-word; word-break: normal; min-width: 80px; }
 
-    /* Code blocks */
-    pre { font-size: 0.78rem; padding: 12px 14px; }
+    /* CLI commands — romper solo cuando es necesario, no caracter a caracter */
+    .cli-cmd { white-space: normal; overflow-wrap: break-word; word-break: normal; }
+
+    /* Code blocks — width: 100% fuerza al pre a respetar el ancho del contenedor
+       para que overflow-x: auto active el scroll local en lugar de romper la página */
+    pre { font-size: 0.78rem; padding: 12px 14px; width: 100%; }
 
     /* Callouts */
     .callout { padding: 12px 14px; font-size: 0.88rem; }
 
     /* Step */
     .step { gap: 12px; }
+
+    /* Quiz touch targets */
+    .quiz-option { padding: 12px 14px; overflow-wrap: break-word; }
+    /* code inline dentro de opciones: rutas largas sin espacios deben romper */
+    .quiz-q code { word-break: break-all; overflow-wrap: break-word; }
   }
 
   @media (max-width: 480px) {
@@ -207,4 +220,24 @@
     .quiz-result { padding: 18px 14px; }
     .quiz-score { font-size: 2rem; }
     .quiz-wrap { max-width: 100%; }
+
+    /* Badge en section header: flex-wrap para que no desborde si el texto es largo */
+    .section-header h2 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-header .badge { margin-left: 0; }
+  }
+
+  /* En pantallas muy chicas (320–360px), aligerar el header sticky */
+  @media (max-width: 360px) {
+    header { padding: 10px 12px 10px; }
+    .header-titles p { display: none; }
+    .header-titles h1 { font-size: 1.05rem; }
+    main { padding: 14px 10px; }
+    #search { padding: 9px 12px; }
+    /* Ajustar variable para scroll-padding-top en pantallas donde el header es más chico */
+    :root { --header-h: 72px; }
   }
