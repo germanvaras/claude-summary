@@ -168,9 +168,9 @@ Official source: https://docs.anthropic.com/en/docs/claude-code/hooks
 
 ---
 
-## Combined workflow: adding a new section
+## Combined workflows
 
-This is the recommended workflow for adding a section after an Anthropic release:
+### Adding a new section (after an Anthropic release)
 
 ```bash
 # 1. Start a Claude Code session in this project
@@ -180,16 +180,70 @@ claude
 # 2. Create the new section
 /content-writer add memory-management
 
-# 3. After it's created, validate it immediately
+# 3. Validate it immediately — Guardian will also propose quiz questions if needed
 /guardian memory-management
 
-# 4. If Guardian finds issues, fix them
+# 4. If Guardian finds issues or proposes quiz questions, apply them
 /guardian --fix memory-management
 
-# 5. Exit and commit
+# 5. Exit and commit (Guardian will suggest the exact git add line)
 /exit
-git add en/sections/memory-management.html es/sections/memory-management.html en/index.html es/index.html
+git add en/sections/memory-management.html es/sections/memory-management.html en/index.html es/index.html en/sections/quiz.html es/sections/quiz.html
 git commit -m "feat: add memory-management section"
+```
+
+### Fixing outdated content in an existing section
+
+```bash
+claude
+
+# Rewrite the section from official docs
+/content-writer update hooks
+
+# Validate the result
+/guardian --fix hooks
+
+/exit
+git add en/sections/hooks.html es/sections/hooks.html
+git commit -m "fix(hooks): update to match current official docs"
+```
+
+### Adding a specific piece of info (patch)
+
+```bash
+claude
+
+/content-writer patch hooks --add "PreCompact event"
+/guardian --fix hooks
+
+/exit
+git add en/sections/hooks.html es/sections/hooks.html
+git commit -m "fix(hooks): add PreCompact event documentation"
+```
+
+### Syncing translations
+
+```bash
+claude
+
+/content-writer translate hooks
+/guardian hooks   # optional: verify the synced version
+
+/exit
+git add es/sections/hooks.html
+git commit -m "fix(hooks): sync Spanish translation with English"
+```
+
+### Fixing content found by Guardian (no content-writer needed)
+
+```bash
+claude
+
+/guardian --fix models
+
+/exit
+# Guardian will show you the exact files to add
+git commit -m "fix(models): correct outdated model names and context windows"
 ```
 
 ---
