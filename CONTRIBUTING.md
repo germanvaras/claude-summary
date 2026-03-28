@@ -16,6 +16,51 @@
 
 ---
 
+## Getting started
+
+> The `main` branch is **protected** — direct pushes are rejected. All changes must go through a Pull Request.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/germanvaras/claude-summary.git
+cd claude-summary
+```
+
+### 2. Create a branch — always required
+
+Use a descriptive name based on what you're changing:
+
+```bash
+# New section
+git checkout -b feat/add-rate-limits
+
+# Fix or update existing content
+git checkout -b fix/hooks-outdated-flags
+
+# Translation sync
+git checkout -b fix/hooks-spanish-sync
+```
+
+| Type | Prefix | Example |
+|---|---|---|
+| New section | `feat/` | `feat/add-rate-limits` |
+| Fix / update | `fix/` | `fix/hooks-outdated-flags` |
+| Translation | `fix/` | `fix/hooks-spanish-sync` |
+| Docs / meta | `docs/` | `docs/update-contributing-guide` |
+
+### 3. Make your changes, then open a Pull Request
+
+```bash
+git add <files>
+git commit -m "feat: add rate-limits section"
+git push origin feat/add-rate-limits
+```
+
+Then go to [github.com/germanvaras/claude-summary](https://github.com/germanvaras/claude-summary) and click **"Compare & pull request"**.
+
+---
+
 ## Before you start
 
 1. **Check official docs first.** All content must be traceable to [docs.anthropic.com](https://docs.anthropic.com). If you're not sure, open an issue instead of a PR.

@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guía del Sistema de Agentes — Claude Resources</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple:    #A100FF;
+      --purple-dim: #7000bb;
+      --purple-bg: #1a0030;
+      --bg:        #0f0f1a;
+      --bg2:       #14142a;
+      --bg3:       #1a1a2e;
+      --border:    #2a2a4a;
+      --text:      #e0e0f0;
+      --muted:     #8888aa;
+      --green:     #4fff80;
+      --yellow:    #ffcc40;
+      --red:       #ff6060;
+      --blue:      #80c8ff;
+      --sidebar-w: 260px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* ── TOP NAV ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: #0a0a18;
+      border-bottom: 2px solid var(--purple);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 100;
+      gap: 16px;
+    }
+    header .logo { font-weight: 900; font-size: 1rem; color: #fff; letter-spacing: -0.3px; }
+    header .logo span { color: var(--purple); }
+    header nav { display: flex; gap: 4px; margin-left: auto; }
+    header nav a {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      transition: all .15s;
+    }
+    header nav a:hover, header nav a.active {
+      background: var(--purple);
+      color: #fff;
+    }
+    .lang-btn {
+      margin-left: 12px;
+      padding: 5px 12px;
+      background: var(--border);
+      border: 1px solid #444470;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .lang-btn:hover { border-color: var(--purple); color: var(--purple); }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      padding-top: 56px;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    aside {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      width: var(--sidebar-w);
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 24px 0 40px;
+    }
+    aside .group-label {
+      padding: 10px 20px 4px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: #555580;
+    }
+    aside a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: all .15s;
+      border-left: 3px solid transparent;
+    }
+    aside a:hover { color: var(--text); background: #1f1f38; }
+    aside a.active {
+      color: #c080ff;
+      background: #1a0030;
+      border-left-color: var(--purple);
+    }
+    aside a .icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+
+    /* ── MAIN ── */
+    main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: calc(100% - var(--sidebar-w));
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #1a0030 0%, #2d0060 50%, #1a0030 100%);
+      border-bottom: 3px solid var(--purple);
+      padding: 56px 60px 48px;
+    }
+    .hero h1 { font-size: 2.4rem; font-weight: 900; color: #fff; }
+    .hero h1 span { color: var(--purple); }
+    .hero p { margin-top: 12px; color: #c0a0ff; font-size: 1.05rem; max-width: 560px; }
+    .hero-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .pill-purple { background: var(--purple); color: #fff; }
+    .pill-outline { background: transparent; border: 1px solid #6030b0; color: #c080ff; }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 48px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+    section:last-child { border-bottom: none; }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .section-heading .icon { font-size: 1.6rem; }
+    .section-heading h2 { font-size: 1.5rem; font-weight: 800; color: #fff; }
+    .section-heading .tag {
+      margin-left: auto;
+      background: #A100FF22;
+      border: 1px solid #A100FF44;
+      color: #c080ff;
+      border-radius: 12px;
+      padding: 3px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    h3 { font-size: 1rem; font-weight: 700; color: #d0b0ff; margin-bottom: 10px; }
+
+    /* ── QUICKSTART WIZARD ── */
+    .wizard {
+      background: var(--bg2);
+      border: 2px solid var(--purple);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .wizard-tabs {
+      display: flex;
+      background: #0d0d20;
+      border-bottom: 1px solid var(--border);
+    }
+    .wizard-tabs button {
+      flex: 1;
+      padding: 14px 10px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      line-height: 1.3;
+    }
+    .wizard-tabs button:hover { color: var(--text); }
+    .wizard-tabs button.active {
+      color: var(--purple);
+      border-bottom-color: var(--purple);
+      background: #140025;
+    }
+    .wizard-panel { display: none; padding: 28px 32px; }
+    .wizard-panel.active { display: block; }
+
+    /* ── STEP LIST ── */
+    .steps { list-style: none; padding: 0; counter-reset: step; }
+    .step {
+      counter-increment: step;
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; padding-bottom: 0; }
+    .step-num {
+      min-width: 34px;
+      height: 34px;
+      background: var(--purple);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-num.done { background: #1a6030; color: var(--green); }
+    .step-body { flex: 1; }
+    .step-body strong { color: #fff; font-size: 0.95rem; }
+    .step-body p { color: var(--muted); font-size: 0.87rem; margin-top: 4px; }
+
+    /* ── CODE ── */
+    pre {
+      background: #0a0a18;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--purple);
+      border-radius: 8px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.875rem;
+      color: #c0e0ff;
+    }
+    .c  { color: #556; }
+    .k  { color: var(--green); }
+    .f  { color: #ffb080; }
+    .s  { color: #ffdd80; }
+    p code, li code, td code {
+      background: #1a1a30;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.84rem;
+      color: #80d8ff;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .card p, .card li { color: #b8b8d0; font-size: 0.92rem; }
+    .card ul { padding-left: 18px; }
+    .card ul li { margin-bottom: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── AGENT OVERVIEW CARDS ── */
+    .agent-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+    @media (max-width: 700px) { .agent-cards { grid-template-columns: 1fr; } }
+    .agent-card {
+      border-radius: 12px;
+      padding: 24px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .agent-card:hover { border-color: var(--purple); transform: translateY(-2px); }
+    .agent-card.guardian { background: linear-gradient(135deg, #1a0d2e, #120820); border-color: #6030b0; }
+    .agent-card.writer   { background: linear-gradient(135deg, #0d1a2e, #081220); border-color: #2060b0; }
+    .agent-card h3 { font-size: 1.1rem; color: #fff; margin-bottom: 8px; }
+    .agent-card .trigger { font-family: monospace; font-size: 0.9rem; font-weight: 700; color: var(--purple); }
+    .agent-card p { font-size: 0.85rem; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+    .agent-card .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #ffffff12;
+      color: #c0c0e0;
+    }
+
+    /* ── STATUS GRID ── */
+    .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+    @media (max-width: 600px) { .status-grid { grid-template-columns: 1fr; } }
+    .status-card {
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .status-card.ok   { background: #0a2a18; border: 1px solid #1a5030; }
+    .status-card.warn { background: #261d00; border: 1px solid #7a5a00; }
+    .status-card.err  { background: #260a0a; border: 1px solid #7a1a1a; }
+    .status-card .emoji { font-size: 1.2rem; }
+    .status-card .lbl  { font-weight: 700; font-size: 0.85rem; margin-bottom: 3px; }
+    .status-card.ok   .lbl { color: var(--green); }
+    .status-card.warn .lbl { color: var(--yellow); }
+    .status-card.err  .lbl { color: var(--red); }
+    .status-card p { font-size: 0.8rem; color: #909090; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th {
+      background: #200840;
+      color: #d0a0ff;
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 700;
+      border-bottom: 2px solid #A100FF33;
+      white-space: nowrap;
+    }
+    td { padding: 9px 14px; border-bottom: 1px solid #1f1f38; color: #b8b8d0; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1a1a32; }
+
+    /* ── WORKFLOW ── */
+    .workflow {
+      background: #0a0a18;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 18px;
+    }
+    .workflow h3 {
+      color: var(--purple);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.97rem;
+    }
+
+    /* ── COMMAND REF ── */
+    .cmd-ref { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 650px) { .cmd-ref { grid-template-columns: 1fr; } }
+    .cmd-item {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .cmd-item .cmd-line { font-family: monospace; font-size: 0.85rem; color: var(--green); margin-bottom: 6px; font-weight: 700; }
+    .cmd-item p { font-size: 0.83rem; color: var(--muted); }
+
+    /* ── TROUBLESHOOT ── */
+    .trouble {
+      background: var(--bg3);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--red);
+    }
+    .trouble .prob { font-weight: 700; color: #ff9090; margin-bottom: 6px; font-size: 0.92rem; }
+    .trouble .sol  { color: #a0c0ff; font-size: 0.87rem; }
+
+    /* ── FILE TREE ── */
+    .filetree {
+      background: #0a0a18;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 22px;
+      font-family: monospace;
+      font-size: 0.88rem;
+      color: #a0d0ff;
+      line-height: 2;
+    }
+    .filetree .dir  { color: #d0b0ff; font-weight: 700; }
+    .filetree .file { color: var(--green); }
+    .filetree .note { color: #55556a; }
+
+    /* ── COPY BTN ── */
+    .copy-wrap { position: relative; }
+    .copy-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: #2a2a50;
+      border: 1px solid #4a4a80;
+      border-radius: 5px;
+      color: var(--muted);
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .copy-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .copy-btn.copied { background: #1a5030; color: var(--green); border-color: #2a7040; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #3a3a60; border-radius: 3px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #000;
+      color: #666;
+      text-align: center;
+      font-size: 0.78rem;
+      padding: 14px;
+      letter-spacing: .03em;
+      margin-left: var(--sidebar-w);
+    }
+    footer span { color: var(--purple); }
+    footer a { color: var(--purple); text-decoration: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      aside { display: none; }
+      main  { margin-left: 0; max-width: 100%; }
+      footer { margin-left: 0; }
+      section { padding: 32px 24px; }
+      .hero   { padding: 40px 24px 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<header>
+  <div class="logo">Claude <span>Agentes</span></div>
+  <nav>
+    <a href="#quickstart" class="active">Inicio Rápido</a>
+    <a href="#guardian">Guardian</a>
+    <a href="#writer">Content Writer</a>
+    <a href="#workflows">Flujos</a>
+    <a href="#reference">Referencia</a>
+    <a href="#contributing">Contribuir</a>
+  </nav>
+  <a class="lang-btn" href="AGENTS-guide-en.html" title="Switch to English">🌐 EN</a>
+</header>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside id="sidebar">
+    <div class="group-label">Primeros Pasos</div>
+    <a href="#overview" class="active"><span class="icon">🏠</span> Descripción</a>
+    <a href="#contributing"><span class="icon">🤝</span> Contribuir</a>
+    <a href="#quickstart"><span class="icon">🚀</span> Inicio Rápido</a>
+    <a href="#setup"><span class="icon">⚙️</span> Configuración</a>
+
+    <div class="group-label">Agentes</div>
+    <a href="#guardian"><span class="icon">🛡️</span> Guardian</a>
+    <a href="#guardian-commands"><span class="icon">⌨️</span> Comandos Guardian</a>
+    <a href="#guardian-report"><span class="icon">📋</span> Formato del Reporte</a>
+    <a href="#writer"><span class="icon">✍️</span> Content Writer</a>
+    <a href="#writer-commands"><span class="icon">⌨️</span> Comandos Writer</a>
+
+    <div class="group-label">Uso</div>
+    <a href="#workflows"><span class="icon">🔄</span> Flujos de Trabajo</a>
+    <a href="#reference"><span class="icon">📚</span> Referencia Rápida</a>
+    <a href="#troubleshooting"><span class="icon">🔧</span> Solución de Problemas</a>
+    <a href="#files"><span class="icon">📁</span> Estructura de Archivos</a>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <!-- HERO -->
+    <div class="hero" id="overview">
+      <h1>Sistema de <span>Agentes</span></h1>
+      <p>Dos agentes integrados en Claude Code que mantienen tu documentación precisa, bilingüe y sincronizada con las fuentes oficiales de Anthropic.</p>
+      <div class="hero-badges">
+        <span class="pill pill-purple">🛡️ Guardian</span>
+        <span class="pill pill-purple">✍️ Content Writer</span>
+        <span class="pill pill-outline">Bilingüe EN + ES</span>
+        <span class="pill pill-outline">Claude Code Skills</span>
+      </div>
+    </div>
+
+    <!-- CONTRIBUTING -->
+    <section id="contributing">
+      <div class="section-heading">
+        <span class="icon">🤝</span>
+        <h2>Cómo Contribuir</h2>
+        <span class="tag">Repositorio</span>
+      </div>
+
+      <div class="card" style="border-color:#2060b0; background:linear-gradient(135deg,#0d1a2e,#081220);">
+        <h3>Repositorio</h3>
+        <p style="margin-bottom:12px;">Todas las contribuciones pasan por GitHub. La rama <code>main</code> está <strong style="color:var(--yellow);">protegida</strong> — no se permiten pushes directos. Es obligatorio abrir un Pull Request.</p>
+        <div class="copy-wrap">
+          <pre><code>https://github.com/germanvaras/claude-summary.git</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:16px;">Flujo paso a paso</h3>
+      <ol class="steps">
+        <li class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <strong>Clonar el repositorio</strong>
+            <div class="copy-wrap">
+              <pre><code><span class="k">git</span> clone https://github.com/germanvaras/claude-summary.git
+<span class="k">cd</span> claude-summary</code></pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <strong>Crear una nueva rama <span style="color:var(--red);font-size:0.8rem;font-weight:700;">— obligatorio, main está protegida</span></strong>
+            <p>Usa un nombre descriptivo que refleje qué estás cambiando.</p>
+            <div class="copy-wrap">
+              <pre><code><span class="c"># Para una nueva sección</span>
+<span class="k">git</span> checkout -b feat/add-rate-limits
+
+<span class="c"># Para una corrección</span>
+<span class="k">git</span> checkout -b fix/hooks-flags-desactualizados
+
+<span class="c"># Para sincronizar traducción</span>
+<span class="k">git</span> checkout -b fix/hooks-sync-espanol</code></pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <strong>Realizar los cambios usando los agentes</strong>
+            <div class="copy-wrap">
+              <pre><code><span class="k">claude</span>
+<span class="k">/content-writer</span> add rate-limits   <span class="c"># o update / patch / translate</span>
+<span class="k">/guardian</span> <span class="f">--fix</span> rate-limits        <span class="c"># siempre validar antes de commitear</span>
+/exit</code></pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <strong>Commitear los cambios</strong>
+            <div class="copy-wrap">
+              <pre><code><span class="k">git</span> add en/sections/rate-limits.html es/sections/rate-limits.html \
+        en/index.html es/index.html
+<span class="k">git</span> commit -m <span class="s">"feat: add rate-limits section"</span></code></pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <strong>Pushear la rama y abrir un Pull Request</strong>
+            <div class="copy-wrap">
+              <pre><code><span class="k">git</span> push origin feat/add-rate-limits</code></pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <p style="margin-top:10px;">Luego ir a <a href="https://github.com/germanvaras/claude-summary" target="_blank" style="color:#80c8ff;">github.com/germanvaras/claude-summary</a> y hacer clic en <strong style="color:#fff;">"Compare &amp; pull request"</strong>.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="card" style="margin-top:20px; border-color:#7a1a1a; background:#1a0808;">
+        <h3 style="color:var(--red);">La rama main está protegida</h3>
+        <p>Hacer push directo a <code>main</code> será rechazado. <strong>Siempre trabaja en una rama separada</strong> y envía los cambios mediante Pull Request. Los PRs son revisados antes de mergearse.</p>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">Convenciones para nombres de ramas</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tipo</th><th>Prefijo</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td>Nueva sección</td><td><code>feat/</code></td><td><code>feat/add-rate-limits</code></td></tr>
+              <tr><td>Corrección / actualización</td><td><code>fix/</code></td><td><code>fix/hooks-flags-desactualizados</code></td></tr>
+              <tr><td>Sincronizar traducción</td><td><code>fix/</code></td><td><code>fix/hooks-sync-espanol</code></td></tr>
+              <tr><td>Docs / meta</td><td><code>docs/</code></td><td><code>docs/actualizar-guia-contribucion</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK START -->
+    <section id="quickstart">
+      <div class="section-heading">
+        <span class="icon">🚀</span>
+        <h2>Inicio Rápido</h2>
+        <span class="tag">Empezar aquí</span>
+      </div>
+
+      <div class="agent-cards">
+        <div class="agent-card guardian" onclick="location.href='#guardian'">
+          <div class="trigger">/guardian</div>
+          <h3>Agente Guardian</h3>
+          <p>Valida cada sección contra la documentación oficial de Anthropic y marca todo lo que esté desactualizado, incorrecto o faltante.</p>
+          <div class="chips">
+            <span class="chip">Validar</span>
+            <span class="chip">Auditar</span>
+            <span class="chip">Auto-corregir</span>
+          </div>
+        </div>
+        <div class="agent-card writer" onclick="location.href='#writer'">
+          <div class="trigger">/content-writer</div>
+          <h3>Agente Content Writer</h3>
+          <p>Crea nuevas secciones bilingües o actualiza las existentes, siempre con fuente en la documentación oficial de Anthropic.</p>
+          <div class="chips">
+            <span class="chip">add</span>
+            <span class="chip">update</span>
+            <span class="chip">patch</span>
+            <span class="chip">translate</span>
+          </div>
+        </div>
+      </div>
+
+      <p style="color:var(--muted); margin-bottom:20px; font-size:0.9rem;">Sigue el asistente paso a paso para ejecutar tu primer comando en menos de 2 minutos:</p>
+
+      <!-- WIZARD -->
+      <div class="wizard">
+        <div class="wizard-tabs">
+          <button class="active" onclick="showPanel(0)">① Instalar</button>
+          <button onclick="showPanel(1)">② Abrir Sesión</button>
+          <button onclick="showPanel(2)">③ Usar Guardian</button>
+          <button onclick="showPanel(3)">④ Usar Writer</button>
+          <button onclick="showPanel(4)">⑤ Commitear</button>
+        </div>
+
+        <div class="wizard-panel active" id="panel-0">
+          <h3>Instalar Claude Code</h3>
+          <p style="color:var(--muted); font-size:0.88rem; margin-bottom:14px;">Solo necesitas hacerlo una vez. Requiere Node.js ≥ 18.</p>
+          <div class="copy-wrap">
+            <pre><code><span class="k">npm</span> install -g @anthropic-ai/claude-code</code></pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <div class="card" style="margin-top:14px;">
+            <h3>Verificar la instalación</h3>
+            <div class="copy-wrap">
+              <pre><code><span class="k">claude</span> --version</code></pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <p>Deberías ver un número de versión como <code>1.x.x</code>.</p>
+          </div>
+        </div>
+
+        <div class="wizard-panel" id="panel-1">
+          <h3>Abrir una sesión de Claude Code en este proyecto</h3>
+          <p style="color:var(--muted); font-size:0.88rem; margin-bottom:14px;">Las skills se cargan automáticamente al iniciar la sesión dentro de la carpeta del proyecto.</p>
+          <div class="copy-wrap">
+            <pre><code><span class="k">cd</span> claude-summary
+<span class="k">claude</span></code></pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <ol class="steps" style="margin-top:16px;">
+            <li class="step">
+              <div class="step-num done">✓</div>
+              <div class="step-body">
+                <strong>Esperar el prompt de la sesión</strong>
+                <p>Verás un prompt <code>&gt;</code> dentro de la sesión de Claude Code.</p>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <strong>Confirmar que las skills están cargadas</strong>
+                <p>Escribe <code>/skills</code> — deberías ver <strong>guardian</strong> y <strong>content-writer</strong> en la lista.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="wizard-panel" id="panel-2">
+          <h3>Ejecutar Guardian — Validar una sección</h3>
+          <p style="color:var(--muted); font-size:0.88rem; margin-bottom:14px;">Dentro de la sesión de Claude Code, escribe uno de los siguientes:</p>
+          <div class="copy-wrap">
+            <pre><code><span class="c"># Validar una sola sección (ej: hooks)</span>
+<span class="k">/guardian</span> hooks
+
+<span class="c"># O validar todo el sitio</span>
+<span class="k">/guardian</span></code></pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <p style="color:var(--muted); font-size:0.87rem; margin-top:12px;">Guardian descargará los docs oficiales de Anthropic, los comparará con tus archivos de sección y devolverá un reporte con ítems ✅ / ⚠️ / ❌.</p>
+          <div class="copy-wrap" style="margin-top:12px;">
+            <pre><code><span class="c"># ¿Encontró problemas? Aplicar correcciones automáticamente:</span>
+<span class="k">/guardian</span> <span class="f">--fix</span> hooks</code></pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+        </div>
+
+        <div class="wizard-panel" id="panel-3">
+          <h3>Ejecutar Content Writer — Agregar o actualizar contenido</h3>
+          <p style="color:var(--muted); font-size:0.88rem; margin-bottom:14px;">Dentro de la misma sesión de Claude Code:</p>
+          <div class="copy-wrap">
+            <pre><code><span class="c"># Agregar una sección completamente nueva</span>
+<span class="k">/content-writer</span> add <span class="s">rate-limits</span>
+
+<span class="c"># Reescribir una sección desactualizada</span>
+<span class="k">/content-writer</span> update <span class="s">hooks</span>
+
+<span class="c"># Agregar un dato específico</span>
+<span class="k">/content-writer</span> patch <span class="s">hooks</span> <span class="f">--add</span> <span class="s">"PreCompact event"</span>
+
+<span class="c"># Sincronizar la traducción al español</span>
+<span class="k">/content-writer</span> translate <span class="s">hooks</span></code></pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <p style="color:var(--muted); font-size:0.87rem; margin-top:12px;">Content Writer pedirá confirmación antes de escribir archivos. Siempre ejecuta <code>/guardian SLUG</code> después para validar lo generado.</p>
+        </div>
+
+        <div class="wizard-panel" id="panel-4">
+          <h3>Salir de la sesión y commitear los cambios</h3>
+          <div class="copy-wrap">
+            <pre><code><span class="c"># Terminar la sesión de Claude Code</span>
+/exit
+
+<span class="c"># Agregar los archivos modificados (ejemplo: sección hooks)</span>
+<span class="k">git</span> add en/sections/hooks.html es/sections/hooks.html
+
+<span class="c"># Commitear</span>
+<span class="k">git</span> commit -m <span class="s">"fix(hooks): actualizar según docs oficiales"</span></code></pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+          </div>
+          <div class="card" style="margin-top:14px; border-color:#1a5030;">
+            <h3 style="color:var(--green);">Tip: Guardian sugiere el git add exacto</h3>
+            <p>Después de ejecutar <code>/guardian --fix</code>, el agente imprime el comando <code>git add</code> exacto para los archivos que modificó. Solo cópialo y pégalo.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP -->
+    <section id="setup">
+      <div class="section-heading">
+        <span class="icon">⚙️</span>
+        <h2>Configuración</h2>
+        <span class="tag">Prerrequisitos</span>
+      </div>
+
+      <ol class="steps">
+        <li class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <strong>Instalar Claude Code de forma global</strong>
+            <p>Requiere Node.js ≥ 18.</p>
+            <pre><code><span class="k">npm</span> install -g @anthropic-ai/claude-code</code></pre>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <strong>Navegar a la carpeta del proyecto</strong>
+            <pre><code><span class="k">cd</span> claude-summary</code></pre>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <strong>Iniciar una sesión de Claude Code</strong>
+            <pre><code><span class="k">claude</span></code></pre>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <strong>Verificar que las skills están disponibles</strong>
+            <p>Escribe <code>/skills</code> dentro de la sesión para confirmar que ambos agentes están cargados.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="card" style="margin-top:4px; border-color:#444470;">
+        <h3>Las skills se cargan automáticamente desde <code>.claude/skills/</code></h3>
+        <p>No se necesita instalación manual. Mientras inicies la sesión desde dentro de la carpeta <code>claude-summary</code>, ambos agentes siempre estarán disponibles.</p>
+      </div>
+    </section>
+
+    <!-- GUARDIAN -->
+    <section id="guardian">
+      <div class="section-heading">
+        <span class="icon">🛡️</span>
+        <h2>Agente Guardian</h2>
+        <span class="tag">Validación</span>
+      </div>
+
+      <div class="card">
+        <h3>¿Qué hace?</h3>
+        <p>Valida secciones de documentación contra las fuentes oficiales de Anthropic. Detecta flags CLI desactualizados, nombres de modelos incorrectos, comportamientos mal descritos y contenido faltante.</p>
+      </div>
+
+      <div id="guardian-commands">
+        <h3 style="margin-bottom:12px;">Comandos</h3>
+        <div class="cmd-ref">
+          <div class="cmd-item">
+            <div class="cmd-line">/guardian</div>
+            <p>Auditoría completa — valida todas las secciones</p>
+          </div>
+          <div class="cmd-item">
+            <div class="cmd-line">/guardian SLUG</div>
+            <p>Validar una sola sección por su slug</p>
+          </div>
+          <div class="cmd-item">
+            <div class="cmd-line">/guardian SLUG1 SLUG2</div>
+            <p>Validar varias secciones a la vez</p>
+          </div>
+          <div class="cmd-item">
+            <div class="cmd-line">/guardian --fix SLUG</div>
+            <p>Validar Y aplicar correcciones (pide confirmación)</p>
+          </div>
+        </div>
+
+        <div class="copy-wrap" style="margin-top:16px;">
+          <pre><code><span class="c"># Auditoría completa</span>
+<span class="k">/guardian</span>
+
+<span class="c"># Una sola sección</span>
+<span class="k">/guardian</span> hooks
+
+<span class="c"># Varias secciones</span>
+<span class="k">/guardian</span> models tokens mcp
+
+<span class="c"># Validar y corregir</span>
+<span class="k">/guardian</span> <span class="f">--fix</span> hooks</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">Cómo funciona — 4 pasos</h3>
+        <ol class="steps">
+          <li class="step">
+            <div class="step-num">1</div>
+            <div class="step-body"><strong>Descarga la página relevante</strong><p>Obtiene la sección de <code>docs.anthropic.com</code></p></div>
+          </li>
+          <li class="step">
+            <div class="step-num">2</div>
+            <div class="step-body"><strong>Lee tus archivos de sección</strong><p>Lee tanto <code>en/sections/SLUG.html</code> como <code>es/sections/SLUG.html</code></p></div>
+          </li>
+          <li class="step">
+            <div class="step-num">3</div>
+            <div class="step-body"><strong>Compara cada dato factual</strong><p>Flags CLI, nombres de modelos, context windows, nombres de eventos, config keys</p></div>
+          </li>
+          <li class="step">
+            <div class="step-num">4</div>
+            <div class="step-body"><strong>Genera un reporte</strong><p>Tres categorías: ✅ Correcto · ⚠️ Desactualizado · ❌ Faltante</p></div>
+          </li>
+        </ol>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">Categorías del reporte</h3>
+        <div class="status-grid">
+          <div class="status-card ok">
+            <div class="emoji">✅</div>
+            <div><div class="lbl">Correcto</div><p>Coincide exactamente con la documentación oficial</p></div>
+          </div>
+          <div class="status-card warn">
+            <div class="emoji">⚠️</div>
+            <div><div class="lbl">Desactualizado / Inexacto</div><p>Existe pero no coincide con la versión oficial actual</p></div>
+          </div>
+          <div class="status-card err">
+            <div class="emoji">❌</div>
+            <div><div class="lbl">Faltante</div><p>Está en los docs oficiales pero ausente en tu sección</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="guardian-report" style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">Ejemplo de reporte generado</h3>
+        <pre><code>## Guardian Report: hooks
+Validated: 2026-03-28
+Official source: https://docs.anthropic.com/en/docs/claude-code/hooks
+
+### ✅ Correcto
+- PostToolUse event name — matches official docs
+- Hook timeout default (60s) — correct
+
+### ⚠️ Desactualizado / Inexacto
+- "stdin" payload field listed as "input" → official docs use "stdin"
+  File: en/sections/hooks.html (look for: "input")
+
+### ❌ Faltante
+- PreCompact hook event not documented (added in recent release)
+
+| Section | Status |  Issues                 |
+|---------|--------|-------------------------|
+| hooks   | ⚠️     | 1 outdated, 1 missing   |</code></pre>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">¿Cuándo usar Guardian?</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Situación</th><th>Comando</th></tr></thead>
+            <tbody>
+              <tr><td>Antes de mergear un PR que toca secciones</td><td><code>/guardian SLUG</code></td></tr>
+              <tr><td>Después de un release de Anthropic</td><td><code>/guardian</code> (auditoría completa)</td></tr>
+              <tr><td>Un colaborador reporta contenido incorrecto</td><td><code>/guardian SLUG</code></td></tr>
+              <tr><td>Mantenimiento regular (mensual)</td><td><code>/guardian</code></td></tr>
+              <tr><td>Corregir problemas detectados de inmediato</td><td><code>/guardian --fix SLUG</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENT WRITER -->
+    <section id="writer">
+      <div class="section-heading">
+        <span class="icon">✍️</span>
+        <h2>Agente Content Writer</h2>
+        <span class="tag">Crear / Actualizar</span>
+      </div>
+
+      <div class="card">
+        <h3>¿Qué hace?</h3>
+        <p>Crea nuevas secciones bilingües o actualiza las existentes, siempre basándose en la documentación oficial de Anthropic. Maneja automáticamente los archivos en inglés y español.</p>
+      </div>
+
+      <div id="writer-commands">
+        <h3 style="margin-bottom:12px;">Comandos</h3>
+        <div class="cmd-ref">
+          <div class="cmd-item">
+            <div class="cmd-line">/content-writer add SLUG</div>
+            <p>Crear una sección bilingüe nueva desde cero</p>
+          </div>
+          <div class="cmd-item">
+            <div class="cmd-line">/content-writer update SLUG</div>
+            <p>Reescribir una sección desde los docs oficiales actuales</p>
+          </div>
+          <div class="cmd-item">
+            <div class="cmd-line">/content-writer patch SLUG --add "X"</div>
+            <p>Insertar un dato específico en una sección</p>
+          </div>
+          <div class="cmd-item">
+            <div class="cmd-line">/content-writer translate SLUG</div>
+            <p>Sincronizar la versión en español con la inglesa (o viceversa)</p>
+          </div>
+        </div>
+
+        <div class="copy-wrap" style="margin-top:16px;">
+          <pre><code><span class="c"># Agregar una sección completamente nueva</span>
+<span class="k">/content-writer</span> add <span class="s">rate-limits</span>
+
+<span class="c"># Reescribir una sección existente</span>
+<span class="k">/content-writer</span> update <span class="s">hooks</span>
+
+<span class="c"># Agregar un dato puntual</span>
+<span class="k">/content-writer</span> patch <span class="s">hooks</span> <span class="f">--add</span> <span class="s">"PreCompact event"</span>
+
+<span class="c"># Sincronizar español ↔ inglés</span>
+<span class="k">/content-writer</span> translate <span class="s">hooks</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">¿Qué hace cada subcomando?</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Comando</th><th>Acción</th><th>Resultado</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>add SLUG</code></td>
+                <td>Sección nueva</td>
+                <td>Crea <code>en/sections/SLUG.html</code> + <code>es/sections/SLUG.html</code>, actualiza la navegación en ambos <code>index.html</code></td>
+              </tr>
+              <tr>
+                <td><code>update SLUG</code></td>
+                <td>Reescritura completa</td>
+                <td>Muestra diferencias vs docs oficial, pide confirmación y reescribe EN + ES</td>
+              </tr>
+              <tr>
+                <td><code>patch SLUG --add "X"</code></td>
+                <td>Adición puntual</td>
+                <td>Inserta el contenido en el lugar correcto dentro de ambas versiones</td>
+              </tr>
+              <tr>
+                <td><code>translate SLUG</code></td>
+                <td>Sincronizar idiomas</td>
+                <td>Identifica qué falta en cada idioma y traduce el contenido diferente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">Convenciones de nomenclatura</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Elemento</th><th>Convención</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td>Slug</td><td>minúsculas, guiones</td><td><code>rate-limits</code></td></tr>
+              <tr><td>Nombre de archivo</td><td>slug + <code>.html</code></td><td><code>rate-limits.html</code></td></tr>
+              <tr><td>ID de sección</td><td><code>section-</code> + slug</td><td><code>section-rate-limits</code></td></tr>
+              <tr><td>Nav <code>data-section</code></td><td>solo el slug</td><td><code>rate-limits</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">Reglas de traducción</h3>
+        <div class="grid-2">
+          <div class="card" style="border-color:#1a5030;">
+            <h3 style="color:var(--green);">✅ Traducir</h3>
+            <ul>
+              <li>Prosa, encabezados, callouts</li>
+              <li>Encabezados y etiquetas de tabla</li>
+              <li>Descripciones de pasos</li>
+              <li>Mensajes de error (prosa)</li>
+            </ul>
+          </div>
+          <div class="card" style="border-color:#4a3010;">
+            <h3 style="color:var(--yellow);">🔒 Mantener en inglés</h3>
+            <ul>
+              <li>Comandos CLI y flags</li>
+              <li>Config keys y rutas de archivo</li>
+              <li>Nombres de modelos y URLs</li>
+              <li>Bloques de código</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKFLOWS -->
+    <section id="workflows">
+      <div class="section-heading">
+        <span class="icon">🔄</span>
+        <h2>Flujos de Trabajo Combinados</h2>
+        <span class="tag">End-to-end</span>
+      </div>
+
+      <div class="workflow">
+        <h3>1. Agregar una nueva sección (tras un release de Anthropic)</h3>
+        <div class="copy-wrap">
+          <pre><code><span class="c"># Iniciar sesión</span>
+<span class="k">cd</span> claude-summary &amp;&amp; claude
+
+<span class="c"># Crear la nueva sección</span>
+<span class="k">/content-writer</span> add memory-management
+
+<span class="c"># Validar inmediatamente</span>
+<span class="k">/guardian</span> memory-management
+
+<span class="c"># Aplicar correcciones si las hay</span>
+<span class="k">/guardian</span> <span class="f">--fix</span> memory-management
+
+<span class="c"># Salir y commitear</span>
+/exit
+<span class="k">git</span> add en/sections/memory-management.html es/sections/memory-management.html \
+        en/index.html es/index.html
+<span class="k">git</span> commit -m <span class="s">"feat: add memory-management section"</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <h3>2. Corregir contenido desactualizado en una sección existente</h3>
+        <div class="copy-wrap">
+          <pre><code><span class="k">claude</span>
+<span class="k">/content-writer</span> update hooks
+<span class="k">/guardian</span> <span class="f">--fix</span> hooks
+/exit
+<span class="k">git</span> add en/sections/hooks.html es/sections/hooks.html
+<span class="k">git</span> commit -m <span class="s">"fix(hooks): update to match current official docs"</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <h3>3. Agregar un dato puntual (patch)</h3>
+        <div class="copy-wrap">
+          <pre><code><span class="k">claude</span>
+<span class="k">/content-writer</span> patch hooks <span class="f">--add</span> <span class="s">"PreCompact event"</span>
+<span class="k">/guardian</span> <span class="f">--fix</span> hooks
+/exit
+<span class="k">git</span> add en/sections/hooks.html es/sections/hooks.html
+<span class="k">git</span> commit -m <span class="s">"fix(hooks): add PreCompact event documentation"</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <h3>4. Sincronizar traducciones</h3>
+        <div class="copy-wrap">
+          <pre><code><span class="k">claude</span>
+<span class="k">/content-writer</span> translate hooks
+<span class="k">/guardian</span> hooks   <span class="c"># opcional: verificar la versión sincronizada</span>
+/exit
+<span class="k">git</span> add es/sections/hooks.html
+<span class="k">git</span> commit -m <span class="s">"fix(hooks): sync Spanish translation with English"</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="workflow">
+        <h3>5. Guardian corrige solo (sin necesitar Content Writer)</h3>
+        <div class="copy-wrap">
+          <pre><code><span class="k">claude</span>
+<span class="k">/guardian</span> <span class="f">--fix</span> models
+/exit
+<span class="c"># Guardian muestra los archivos exactos a stagear</span>
+<span class="k">git</span> commit -m <span class="s">"fix(models): correct outdated model names and context windows"</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- REFERENCE -->
+    <section id="reference">
+      <div class="section-heading">
+        <span class="icon">📚</span>
+        <h2>Referencia Rápida</h2>
+        <span class="tag">Consulta rápida</span>
+      </div>
+
+      <h3 style="margin-bottom:12px; color:#c080ff;">🛡️ Guardian</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Comando</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>/guardian</code></td><td>Auditoría completa de todas las secciones</td></tr>
+            <tr><td><code>/guardian SLUG</code></td><td>Validar una sola sección</td></tr>
+            <tr><td><code>/guardian SLUG1 SLUG2 …</code></td><td>Validar varias secciones</td></tr>
+            <tr><td><code>/guardian --fix SLUG</code></td><td>Validar y aplicar correcciones (con confirmación)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-top:24px; margin-bottom:12px; color:#80c8ff;">✍️ Content Writer</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Comando</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>/content-writer add SLUG</code></td><td>Crear una nueva sección bilingüe desde cero</td></tr>
+            <tr><td><code>/content-writer update SLUG</code></td><td>Reescribir una sección desde los docs oficiales</td></tr>
+            <tr><td><code>/content-writer patch SLUG --add "X"</code></td><td>Insertar un dato específico en una sección</td></tr>
+            <tr><td><code>/content-writer translate SLUG</code></td><td>Sincronizar una versión de idioma con la otra</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TROUBLESHOOTING -->
+    <section id="troubleshooting">
+      <div class="section-heading">
+        <span class="icon">🔧</span>
+        <h2>Solución de Problemas</h2>
+        <span class="tag">Problemas comunes</span>
+      </div>
+
+      <div class="trouble">
+        <div class="prob">Las skills no aparecen en <code>/skills</code></div>
+        <div class="sol">Cierra la sesión con <code>/exit</code> y ábrela de nuevo — las skills solo se cargan al inicio de la sesión.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="prob">WebFetch falla para docs.anthropic.com</div>
+        <div class="sol">El sitio puede estar temporalmente no disponible. Espera unos minutos. Guardian intentará automáticamente un fallback con <code>WebSearch</code>.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="prob">Content Writer genera HTML malformado</div>
+        <div class="sol">Ejecuta Guardian inmediatamente después: <code>/guardian SLUG</code>. Identificará problemas estructurales. También puedes validarlo manualmente con las dev tools del navegador (F12 → Consola).</div>
+      </div>
+
+      <div class="trouble">
+        <div class="prob">El agente edita el archivo incorrecto</div>
+        <div class="sol">Verifica que el slug que pasaste coincide exactamente con el nombre de archivo. Los slugs son case-sensitive en sistemas Linux/Mac.</div>
+      </div>
+    </section>
+
+    <!-- FILE STRUCTURE -->
+    <section id="files">
+      <div class="section-heading">
+        <span class="icon">📁</span>
+        <h2>Estructura de Archivos</h2>
+        <span class="tag">Ubicación de skills</span>
+      </div>
+
+      <div class="filetree">
+<span class="dir">claude-summary/</span>
+└── <span class="dir">.claude/</span>
+    └── <span class="dir">skills/</span>
+        ├── <span class="dir">guardian/</span>
+        │   └── <span class="file">SKILL.md</span>      <span class="note">← instrucciones del agente Guardian</span>
+        └── <span class="dir">content-writer/</span>
+            └── <span class="file">SKILL.md</span>      <span class="note">← instrucciones del agente Content Writer</span>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h3>Modificar el comportamiento de los agentes</h3>
+        <p>Para cambiar cómo funciona un agente, edita el <code>SKILL.md</code> correspondiente. Los cambios toman efecto la próxima vez que inicies una sesión de Claude Code.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  Generado desde <strong>AGENTS.md</strong> · <span>Germán Varas + Claudio</span> ·
+  Documentación oficial: <a href="https://docs.anthropic.com/en/docs/claude-code/overview">docs.anthropic.com</a>
+</footer>
+
+<script>
+  function showPanel(i) {
+    document.querySelectorAll('.wizard-panel').forEach((p, idx) => {
+      p.classList.toggle('active', idx === i);
+    });
+    document.querySelectorAll('.wizard-tabs button').forEach((b, idx) => {
+      b.classList.toggle('active', idx === i);
+    });
+  }
+
+  function copyCode(btn) {
+    const pre = btn.parentElement.querySelector('pre');
+    const text = pre ? pre.innerText : '';
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '¡Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copiar';
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const sideLinks = document.querySelectorAll('aside a');
+  const navLinks  = document.querySelectorAll('header nav a');
+
+  function updateActive() {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+    });
+    sideLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+    const topSections = ['quickstart', 'guardian', 'writer', 'workflows', 'reference'];
+    let topCurrent = topSections.find(id => {
+      const el = document.getElementById(id);
+      return el && window.scrollY >= el.offsetTop - 80;
+    }) || 'quickstart';
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + topCurrent);
+    });
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+</body>
+</html>
