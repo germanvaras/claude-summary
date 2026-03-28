@@ -1,0 +1,130 @@
+    <div class="section" id="section-glosario">
+      <div class="section-header"><h2>📖 Glossary <span class="badge">Key terms</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Terms from the Claude Code ecosystem — everything you need to read this documentation without searching every other line.</div></div>
+
+        <div class="glosario-grid">
+
+          <div class="glos-card">
+            <div class="glos-term">Context Window</div>
+            <div class="glos-def">The maximum number of tokens Claude can process in an interaction. This budget covers input + output combined: history, CLAUDE.md, skills, read files (input) and the generated response (output). Models Opus 4.6, Sonnet 4.6, and Haiku 4.5 have 200,000 tokens. The maximum output per response is a separate, substantially lower limit.</div>
+            <div class="glos-example">If the context fills up, Claude loses focus on instructions from early in the conversation — not a bug, it is the context window limit</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Token</div>
+            <div class="glos-def">The basic unit language models use to process text. Not a word or a character — it is a fragment that can be part of a word, a whole word, or a punctuation mark. Approximately 3–4 characters in English. In Spanish the tokenizer is less efficient — the same text consumes more tokens than in English.</div>
+            <div class="glos-example">A 500-word CLAUDE.md consumes ~700 tokens of context in every conversation</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Frontmatter</div>
+            <div class="glos-def">Metadata block at the start of a Markdown file, delimited by <code>---</code>. In Claude Code it is used to define the <code>name</code>, <code>description</code>, and optional fields of skills and custom slash commands.</div>
+            <div class="glos-example">The <code>--- name: pr-review ---</code> block at the start of a SKILL.md is the frontmatter</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Semantic Matching</div>
+            <div class="glos-def">The mechanism by which Claude compares your request with the <code>description</code> field of available skills to decide which one to activate. It does not look for exact words — it interprets the intent and meaning of what you ask. That is why the skill's description is so important.</div>
+            <div class="glos-example">"review the PR" can activate a skill described as "reviews code changes before merge"</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Skill</div>
+            <div class="glos-def">A SKILL.md file inside its own folder that teaches Claude how to perform a specific task. It activates automatically when Claude detects that your request semantically matches its description. No manual invocation required.</div>
+            <div class="glos-example">A <code>pr-review</code> skill activates on its own when you ask to review a PR</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Agent</div>
+            <div class="glos-def">A Claude instance that operates with autonomy within an execution context: it can invoke tools, read and write files, execute commands, and chain actions to complete a complex task without continuous intervention.</div>
+            <div class="glos-example">Claude refactoring an entire module on its own, file by file, verifying it compiles</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Subagent</div>
+            <div class="glos-def">A Claude instance launched by the main agent to execute a delegated task in a completely isolated context. It receives instructions, works independently, and returns results without "seeing" the main conversation.</div>
+            <div class="glos-example">The main agent delegates "write the tests" to a subagent while continuing another task</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Execution Context</div>
+            <div class="glos-def">The isolated environment in which an agent or subagent operates: which tools are available, what instructions were received, and the state of its conversation. Each subagent has its own, separate from the main agent's.</div>
+            <div class="glos-example">The tests subagent does not "see" the main agent's conversation history</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">MCP (Model Context Protocol)</div>
+            <div class="glos-def">An open standard protocol that defines how language models communicate with external tools and services. Allows Claude to connect to databases, APIs, and services without custom integration code. The official server namespace on npm is <code>@modelcontextprotocol/</code>.</div>
+            <div class="glos-example">A PostgreSQL MCP server allows Claude to execute SQL queries directly against a database</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">MCP Server</div>
+            <div class="glos-def">An external process that implements the MCP protocol and exposes capabilities (Tools, Resources, Prompts) that Claude can use during a task. Configured in <code>settings.json</code> and runs as a separate process when Claude Code starts. Can use stdio transport (local process) or HTTP (remote server).</div>
+            <div class="glos-example"><code>@modelcontextprotocol/server-github</code> exposes the GitHub API as tools Claude can invoke</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Hook</div>
+            <div class="glos-def">A script or command that Claude Code executes automatically when a specific event occurs — without the user asking. Hooks receive event information via stdin (JSON) and can allow or block actions via their exit code.</div>
+            <div class="glos-example">A <code>PostToolUse</code> hook runs the linter every time Claude saves a file</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Matcher</div>
+            <div class="glos-def">A regular expression (regex) in the hook configuration that defines which tool or event it matches against. The <code>|</code> character is the regex OR operator. Omitting the field makes the hook fire on any tool.</div>
+            <div class="glos-example"><code>"matcher": "Write|Edit"</code> activates the hook when Claude writes or edits files, but not on Bash or Read</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Slash Command</div>
+            <div class="glos-def">A predefined instruction the user invokes manually by typing <code>/name</code> in the conversation. Three types exist: built-in (system), skill commands (created by you in <code>.claude/commands/</code>), and MCP prompts (exposed by MCP servers).</div>
+            <div class="glos-example"><code>/coverage-report</code> generates the coverage report when the developer decides to run it</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">$ARGUMENTS</div>
+            <div class="glos-def">A special variable available in custom slash command files. Captures all the text the user writes after the command name. Enables creating parameterized commands.</div>
+            <div class="glos-example">In <code>/review feature/login</code>, <code>$ARGUMENTS</code> captures the value <code>feature/login</code></div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Progressive Disclosure</div>
+            <div class="glos-def">An organization technique where only essential content is loaded initially, and additional detail is incorporated on demand. In skills: SKILL.md has the essentials, the <code>references/</code> folder has the extensive material that only loads when needed.</div>
+            <div class="glos-example">The 200-line architecture guide only loads into context when someone asks about architecture</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">allowed-tools</div>
+            <div class="glos-def">An optional field in a skill's frontmatter that restricts which native tools Claude can use while that skill is active. Useful for creating read-only skills or skills with security guardrails.</div>
+            <div class="glos-example"><code>allowed-tools: Read, Grep</code> prevents Claude from writing files while the skill is active</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Settings Cascade</div>
+            <div class="glos-def">Claude Code's configuration resolution system, where multiple <code>settings.json</code> files are combined by level. The precedence order (highest to lowest) is: <strong>Managed → Local → Project → User</strong>. Rules from the most specific level take precedence.</div>
+            <div class="glos-example">A rule in <code>.claude/settings.local.json</code> (Local) overrides the configuration in <code>.claude/settings.json</code> (Project)</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Worktree</div>
+            <div class="glos-def">An additional working directory linked to the same Git repository, allowing multiple branches to be active simultaneously. Claude Code uses the <code>--worktree</code> flag to create an isolated worktree where the agent works without affecting your main directory.</div>
+            <div class="glos-example"><code>claude --worktree</code> creates an isolated repo copy for Claude to do refactoring without touching your current work</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">Headless Mode / Print Mode</div>
+            <div class="glos-def">Claude Code's non-interactive execution mode, activated with <code>claude -p "task"</code>. Sends the prompt, waits for the full response, and exits. Does not open an interactive session. Designed for use in scripts, CI/CD pipelines, and automations.</div>
+            <div class="glos-example"><code>claude -p "generate the changelog for version 2.4.0" --output-format json</code> returns the result as JSON and exits</div>
+          </div>
+
+          <div class="glos-card">
+            <div class="glos-term">/doctor</div>
+            <div class="glos-def">Claude Code's diagnostic slash command that checks the environment state: installed version, authentication, API connectivity, and active configuration. First step for any technical issue.</div>
+            <div class="glos-example">If Claude Code fails silently, open a session and run <code>/doctor</code> to see the diagnostic</div>
+          </div>
+
+        </div>
+      </div>
+    </div>

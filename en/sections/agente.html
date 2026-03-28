@@ -1,0 +1,87 @@
+    <div class="section" id="section-agente">
+      <div class="section-header"><h2>🤖 Agent <span class="badge">Reference</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/sub-agents" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> An agent is not just Claude answering questions — it is Claude executing tasks autonomously, making decisions, and using tools to reach a concrete result without continuous user intervention.</div></div>
+
+        <h3>📌 What is an Agent?</h3>
+        <p>In Claude Code, an agent is a Claude session that can invoke tools, read and write files, execute commands, and chain multiple actions to complete a complex task. The difference from a regular chat is <strong>autonomy</strong>: the agent decides what to do at each step, it does not wait for instruction by instruction.</p>
+
+        <h3>🔄 Operating cycle</h3>
+        <ul>
+          <li>🎯 <strong>Receives a task</strong> — from the user or delegated by another agent.</li>
+          <li>🗺️ <strong>Plans</strong> — breaks the task down into executable steps.</li>
+          <li>⚙️ <strong>Executes tools</strong> — reads files, runs commands, calls APIs.</li>
+          <li>🔍 <strong>Evaluates results</strong> — analyzes the output of each action.</li>
+          <li>🔁 <strong>Iterates</strong> — adjusts the plan based on what it finds, until done.</li>
+        </ul>
+
+        <h3>⚖️ Skill vs. Agent — the key difference</h3>
+        <div class="callout info"><span class="callout-icon">📌</span><div>The most common confusion: a skill <em>teaches</em> Claude how to do something. An agent <em>does it</em>. The skill provides the knowledge; the agent executes with autonomy. They are complementary, not alternatives.</div></div>
+        <table>
+          <thead><tr><th></th><th>🧩 Skill</th><th>🤖 Agent</th></tr></thead>
+          <tbody>
+            <tr><td><strong>What is it?</strong></td><td>Instructions in SKILL.md that Claude reads before acting</td><td>Claude in action: plans, decides, executes, iterates</td></tr>
+            <tr><td><strong>How does it activate?</strong></td><td>Automatically by semantic context</td><td>Any Claude Code session is already an agent</td></tr>
+            <tr><td><strong>Does it modify files?</strong></td><td>Not directly — it provides the procedure</td><td>Yes, uses Read / Write / Edit / Bash autonomously</td></tr>
+            <tr><td><strong>Does it make decisions?</strong></td><td>No — it is passive, only guides</td><td>Yes — chooses which tool to use and when</td></tr>
+            <tr><td><strong>Own context?</strong></td><td>No, lives in the context of the agent that loaded it</td><td>Yes, each agent has its own context</td></tr>
+            <tr><td><strong>Use case</strong></td><td>"Follow this checklist when reviewing PRs"</td><td>"Refactor the entire Orders module"</td></tr>
+          </tbody>
+        </table>
+        <div class="callout ok"><span class="callout-icon">✅</span><div><strong>The ideal combination:</strong> Skill + Agent. The skill gives the specific context ("how to apply CQRS in this project") and the agent executes it autonomously ("refactor OrderService.cs"). Without a skill, the agent improvises. Without an agent, the skill does nothing on its own.</div></div>
+
+        <h3>🌳 Agent tree — orchestration</h3>
+        <p>When a task is too large for a single context, or has independent parts that can run in parallel, the main agent can <strong>delegate work to subagents</strong>. This forms an execution tree:</p>
+        <pre>Main Agent  →  "Migrate the Orders module to CQRS"
+│
+├── Subagent A  →  "Refactor OrderService.cs"
+│                    isolated context · works alone · returns result
+│
+├── Subagent B  →  "Write tests for CreateOrderCommandHandler"
+│                    isolated context · works alone · returns result
+│
+└── Subagent C  →  "Review the affected EF Core migrations"
+                     isolated context · works alone · returns result</pre>
+        <p>The main agent <strong>does not execute the changes directly</strong> — it delegates, receives the results from each subagent, and integrates or validates them. Each subagent works without knowing the others exist.</p>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div><strong>Subagents do not share context.</strong> They do not see the main agent's conversation or each other's. They only receive what the main agent explicitly passes in the delegation instruction.</div></div>
+
+        <h3>🤖 Subagents — isolated context</h3>
+        <p>A subagent is an agent launched by the main one with a specific delegated task. Its main advantage is <strong>isolation</strong>: errors, history, or state of a subagent do not affect the main agent or other subagents.</p>
+        <table>
+          <thead><tr><th>Characteristic</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Own context</strong></td><td>Does not see the main agent's history or other subagents</td></tr>
+            <tr><td><strong>Receives only what's needed</strong></td><td>The main agent passes exactly the instructions and relevant files for its task</td></tr>
+            <tr><td><strong>Runs in parallel</strong></td><td>Multiple subagents can run simultaneously on different parts of the problem</td></tr>
+            <tr><td><strong>Returns results</strong></td><td>Its output (modified files, reports, etc.) returns to the main agent when done</td></tr>
+            <tr><td><strong>No contamination</strong></td><td>An error or loaded context in a subagent does not affect the main agent's context</td></tr>
+          </tbody>
+        </table>
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>When to use subagents:</strong> When the task has independent parts, when the main context is filling up with work that could be isolated, or when you want different parts of the task to use different skills without interference.</div></div>
+
+        <h3>🗂️ Agent types</h3>
+        <table>
+          <thead><tr><th>Type</th><th>Description</th><th>Typical use case</th></tr></thead>
+          <tbody>
+            <tr><td>👤 <strong>Main agent</strong></td><td>The Claude session you interact with directly</td><td>Interactive development, task coordination</td></tr>
+            <tr><td>🤖 <strong>Subagent</strong></td><td>Agent launched by the main one for delegated work in isolated context</td><td>Parallel, independent tasks</td></tr>
+            <tr><td>🔁 <strong>Loop agent</strong></td><td>Agent that iterates until a defined exit condition is met</td><td>Error correction, progressive refactoring</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🛠️ Available tools</h3>
+        <table>
+          <thead><tr><th>Tool</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>Read</code></td><td>Reads the content of a file</td></tr>
+            <tr><td><code>Write</code></td><td>Writes or overwrites a file</td></tr>
+            <tr><td><code>Edit</code></td><td>Modifies specific parts of a file</td></tr>
+            <tr><td><code>Bash</code></td><td>Executes shell commands</td></tr>
+            <tr><td><code>Grep</code></td><td>Searches for patterns in files</td></tr>
+            <tr><td><code>Glob</code></td><td>Lists files by pattern</td></tr>
+            <tr><td><code>Agent</code></td><td>Launches a subagent with isolated context and delegated task</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>An agent with unrestricted access to <code>Write</code> and <code>Bash</code> can modify any file in the project. Always define the minimum necessary scope using <code>allowed-tools</code> in skills or permissions in <code>settings.json</code>.</div></div>
+      </div>
+    </div>

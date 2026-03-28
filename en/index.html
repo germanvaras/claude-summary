@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Resources</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-titles">
+      <h1>Claude <span>Resources</span></h1>
+      <p>Technical reference documentation</p>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="🔍  Search documentation...">
+    </div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="main-nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="nav-overlay" id="nav-overlay"></div>
+  <nav id="main-nav" aria-label="Main navigation">
+    <ul id="nav-list">
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Home</li>
+      <li><a class="nav-link active" data-section="disclaimer"    href="#"><span>⚠️</span> Before You Start</a></li>
+      <li><a class="nav-link"        data-section="setup"         href="#"><span>⚙️</span> CLI Installation</a></li>
+      <li><a class="nav-link"        data-section="auth"          href="#"><span>🔑</span> Authentication</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Fundamentals</li>
+      <li><a class="nav-link"        data-section="modelo"        href="#"><span>🧠</span> Mental Model</a></li>
+      <li><a class="nav-link"        data-section="tokens"        href="#"><span>🪙</span> Tokens &amp; Context</a></li>
+      <li><a class="nav-link"        data-section="modelos"       href="#"><span>🤖</span> Models</a></li>
+      <li><a class="nav-link"        data-section="sesiones"      href="#"><span>🏷️</span> Sessions</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Configuration</li>
+      <li><a class="nav-link"        data-section="claudemd"      href="#"><span>📄</span> CLAUDE.md</a></li>
+      <li><a class="nav-link"        data-section="scopes"        href="#"><span>🗂️</span> Scopes</a></li>
+      <li><a class="nav-link"        data-section="directorios"   href="#"><span>📁</span> Directories</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Tools</li>
+      <li><a class="nav-link"        data-section="skills"        href="#"><span>🧩</span> Skills</a></li>
+      <li><a class="nav-link"        data-section="hooks"         href="#"><span>🪝</span> Hooks</a></li>
+      <li><a class="nav-link"        data-section="mcp"           href="#"><span>🔌</span> MCP Servers</a></li>
+      <li><a class="nav-link"        data-section="slash"         href="#"><span>⚡</span> Slash Commands</a></li>
+      <li><a class="nav-link"        data-section="permisos"      href="#"><span>🔐</span> Permissions</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Agents &amp; Automation</li>
+      <li><a class="nav-link"        data-section="agente"        href="#"><span>🕹️</span> Agent</a></li>
+      <li><a class="nav-link"        data-section="cicd"          href="#"><span>🔄</span> CI/CD</a></li>
+      <li><a class="nav-link"        data-section="worktrees"     href="#"><span>🌿</span> Worktrees</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Reference</li>
+      <li><a class="nav-link"        data-section="glosario"      href="#"><span>📖</span> Glossary</a></li>
+      <li><a class="nav-link"        data-section="cheatsheet"    href="#"><span>📋</span> CLI Cheat Sheet</a></li>
+      <li><a class="nav-link"        data-section="update"        href="#"><span>🔁</span> Updates</a></li>
+      <li><a class="nav-link"        data-section="troubleshoot"  href="#"><span>🔧</span> Troubleshooting</a></li>
+      <li style="padding: 8px 24px 4px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#555;">Practice</li>
+      <li><a class="nav-link"        data-section="impl"          href="#"><span>🚀</span> Implementation</a></li>
+      <li><a class="nav-link"        data-section="quiz"          href="#"><span>🎯</span> Quiz</a></li>
+    </ul>
+  </nav>
+
+  <main id="main-content">
+    <div class="no-results" id="no-results">😕 No results found for your search.</div>
+  </main>
+</div>
+
+<footer>Documentation by <span>Germán Varas + Claudio</span> · 2026</footer>
+
+<script src="../lang.js"></script>
+<script src="../script.js"></script>
+</body>
+</html>

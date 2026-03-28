@@ -1,0 +1,80 @@
+    <div class="section" id="section-worktrees">
+      <div class="section-header"><h2>🌿 Worktrees <span class="badge">Isolation</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/worktrees" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> A worktree is an isolated working copy of the same Git repository. Claude Code can work in a worktree without touching your main directory — ideal for aggressive refactoring, experiments, or high-impact agentic work.</div></div>
+
+        <h3>🌳 What is a git worktree?</h3>
+        <p>Git allows you to have multiple working directories linked to the same repository. Each worktree has its own branch and file state, but they share history. It is like having the project "cloned" in another folder, but much more efficient.</p>
+        <pre># Without worktrees — Claude works directly in your directory
+cd C:\projects\my-api
+claude
+> "refactor the entire Orders module"
+# Claude modifies files in your working directory
+
+# With worktrees — Claude works in an isolated copy
+cd C:\projects\my-api
+claude --worktree
+> "refactor the entire Orders module"
+# Claude works in a separate copy. Your directory is unchanged.</pre>
+
+        <h3>🚀 How to use worktrees with Claude Code</h3>
+
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Start Claude in an isolated worktree</h4>
+          <pre>claude --worktree</pre>
+          <p>Claude Code automatically creates a new worktree from the current branch, starts the session in that worktree, and works there.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Claude works in the worktree</h4>
+          <p>From your main directory you can keep working normally — Claude's changes are in the isolated copy. When the session ends, Claude Code tells you which files changed in the worktree.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Review and decide what to do with the changes</h4>
+          <pre># View changes in the worktree
+git diff HEAD..worktree/branch
+
+# If you like the changes — merge or create PR
+git merge worktree/branch
+
+# If you don't like the changes — discard the worktree
+git worktree remove /path/to/worktree</pre>
+        </div></div>
+
+        <h3>🎯 When to use worktrees</h3>
+        <table>
+          <thead><tr><th>Scenario</th><th>Why worktree</th></tr></thead>
+          <tbody>
+            <tr><td>Large, risky refactoring</td><td>If Claude makes a mistake, your main branch is not affected. You can discard the worktree and start over.</td></tr>
+            <tr><td>Experimenting with architecture</td><td>Try an approach without committing your work in progress.</td></tr>
+            <tr><td>Long-running autonomous agent</td><td>The agent works in parallel in the worktree while you continue on the main branch.</td></tr>
+            <tr><td>CI/CD with human review</td><td>Claude generates changes in a separate branch via worktree; you review and approve before merging.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>⚖️ With worktree vs. without worktree</h3>
+        <table>
+          <thead><tr><th></th><th>Without worktree</th><th>With <code>--worktree</code></th></tr></thead>
+          <tbody>
+            <tr><td>Where does Claude work?</td><td>Directly in your directory</td><td>In an isolated copy</td></tr>
+            <tr><td>Affects your current work?</td><td>Yes — modifies the files you have open</td><td>No — your directory remains intact</td></tr>
+            <tr><td>Can you discard everything?</td><td>Only with git reset or stash</td><td>Yes — simply remove the worktree</td></tr>
+            <tr><td>Can you review before accepting?</td><td>You need to revert manually</td><td>Yes — see the worktree diff and decide</td></tr>
+            <tr><td>Overhead</td><td>None</td><td>Uses extra disk space (a copy of the files)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div>Worktrees require the project to be under Git version control. If the project has no Git repository, the <code>--worktree</code> flag cannot create an isolated copy.</div></div>
+
+        <h3>🛠️ Useful Git commands with worktrees</h3>
+        <pre># View all active worktrees
+git worktree list
+
+# Remove a worktree (when you no longer need it)
+git worktree remove /path/to/worktree
+
+# Clean up orphaned worktrees
+git worktree prune</pre>
+      </div>
+    </div>

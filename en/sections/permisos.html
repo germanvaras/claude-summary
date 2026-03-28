@@ -1,0 +1,77 @@
+    <div class="section" id="section-permisos">
+      <div class="section-header"><h2>🔐 Permissions <span class="badge">Security</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/security" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Permissions are Claude Code's guardrails. They define what Claude can do autonomously, what requires your confirmation, and what is outright blocked — both at the configuration file level and per session.</div></div>
+
+        <h3>🔑 The three possible rules</h3>
+        <table>
+          <thead><tr><th>Rule</th><th>Behavior</th><th>When to use it</th></tr></thead>
+          <tbody>
+            <tr><td><code>allow</code></td><td>Claude executes without asking for confirmation</td><td>Safe, repetitive operations: reading files, running tests, git status</td></tr>
+            <tr><td><code>ask</code></td><td>Claude shows the action and waits for your OK before executing</td><td>Operations you want to review: writing new files, commits, deploys</td></tr>
+            <tr><td><code>deny</code></td><td>Claude cannot execute that action under any circumstances</td><td>Dangerous operations: <code>rm -rf</code>, production commands, access to secrets</td></tr>
+          </tbody>
+        </table>
+
+        <h3>⚙️ Configuration in settings.json</h3>
+        <p>Complete example with all three rules:</p>
+        <pre>{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Bash(git status)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(dotnet test *)",
+      "Bash(npm run test *)"
+    ],
+    "ask": [
+      "Write",
+      "Edit",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(DROP *)",
+      "Bash(kubectl delete *)"
+    ]
+  }
+}</pre>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div>Patterns support wildcards. <code>Bash(git *)</code> covers any git subcommand. <code>Bash(dotnet test *)</code> covers any dotnet test variant. The more specific the pattern, the more control you have.</div></div>
+
+        <h3>🖥️ Session modes</h3>
+        <p>In addition to per-tool rules, Claude Code has modes that control the autonomy level for the entire session. Modes overlay the settings.json rules — <code>deny</code> rules are always respected regardless of mode.</p>
+        <table>
+          <thead><tr><th>Mode</th><th>CLI flag</th><th>Behavior</th><th>Use case</th></tr></thead>
+          <tbody>
+            <tr><td><code>default</code></td><td>(no flag)</td><td>Asks for confirmation on sensitive actions per settings.json rules</td><td>Normal daily development</td></tr>
+            <tr><td><code>plan</code></td><td><code>--permission-mode plan</code></td><td>Claude only plans and describes — does not execute any action</td><td>Review what Claude would do before letting it proceed</td></tr>
+            <tr><td><code>auto</code></td><td><code>--dangerously-skip-permissions</code></td><td>Maximum autonomy — executes everything without confirmations (except deny rules)</td><td>CI/CD pipelines, automated environments</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div><code>--dangerously-skip-permissions</code> bypasses all interactive confirmations. Only use it in controlled automated environments. <code>deny</code> rules in settings.json remain active — they are the only guardrail that works in auto mode.</div></div>
+
+        <h3>🔄 Interaction between modes and settings.json rules</h3>
+        <p>File rules and session mode operate on separate layers:</p>
+        <table>
+          <thead><tr><th>Scenario</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td>Action in <code>allow</code> + <code>default</code> mode</td><td>Executes without confirmation</td></tr>
+            <tr><td>Action in <code>ask</code> + <code>default</code> mode</td><td>Claude asks before executing</td></tr>
+            <tr><td>Action in <code>ask</code> + <code>auto</code> mode</td><td>Executes without confirmation (auto mode overrides ask)</td></tr>
+            <tr><td>Action in <code>deny</code> + <code>auto</code> mode</td><td>Blocked — deny always overrides the mode</td></tr>
+            <tr><td>Action with no rule + <code>default</code> mode</td><td>Claude asks for confirmation (conservative default behavior)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🛠️ Managing permissions from the session</h3>
+        <p>You can view and add rules in real time without touching settings.json:</p>
+        <pre>/permissions</pre>
+        <p>Shows active permissions and allows adding <code>allow</code>, <code>ask</code>, or <code>deny</code> rules for the current session. Changes made with <code>/permissions</code> are session-only — they do not persist to settings.json.</p>
+
+        <div class="callout ok"><span class="callout-icon">✅</span><div><strong>Recommended strategy:</strong> Start with conservative rules (little in <code>allow</code>, much in <code>ask</code>) and loosen as you gain confidence in Claude's behavior in your project. <code>deny</code> rules for destructive operations should always be there.</div></div>
+      </div>
+    </div>

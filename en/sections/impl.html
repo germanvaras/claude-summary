@@ -1,0 +1,163 @@
+    <div class="section" id="section-impl">
+      <div class="section-header"><h2>🚀 Use Case: .NET + EF Core <span class="badge">Integrative example</span></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Scenario:</strong> E-commerce API in <strong>.NET 8 + EF Core + SQL Server</strong>. The team needs to refactor the orders module, maintain test coverage, and a consistent code review process. The principles applied here are the same for any stack — only the commands change.</div></div>
+
+        <h3>📁 Project structure</h3>
+        <pre class="dir-tree"><span class="dir">ecommerce-api/</span>
+├── <span class="file">CLAUDE.md</span>                        <span class="note"># Stack, conventions, .NET restrictions</span>
+├── <span class="dir">.claude/</span>
+│   ├── <span class="file">settings.json</span>                <span class="note"># Hooks + MCP Server (goes to repo)</span>
+│   ├── <span class="file">settings.local.json</span>          <span class="note"># Real connection strings (does NOT go to repo)</span>
+│   ├── <span class="dir">skills/</span>
+│   │   ├── <span class="dir">refactor-dotnet/</span>
+│   │   │   ├── <span class="file">SKILL.md</span>
+│   │   │   └── <span class="dir">references/</span>
+│   │   │       └── <span class="file">patterns.md</span>      <span class="note"># CQRS, Repository, Result&lt;T&gt; guides</span>
+│   │   ├── <span class="dir">test-writer/</span>
+│   │   │   ├── <span class="file">SKILL.md</span>
+│   │   │   └── <span class="dir">references/</span>
+│   │   │       └── <span class="file">test-examples.md</span>
+│   │   └── <span class="dir">pr-review/</span>
+│   │       └── <span class="file">SKILL.md</span>
+│   └── <span class="dir">commands/</span>
+│       └── <span class="file">coverage-report.md</span>
+├── <span class="dir">src/</span>
+│   ├── <span class="dir">EcommerceApi/</span>
+│   ├── <span class="dir">EcommerceApi.Application/</span>
+│   ├── <span class="dir">EcommerceApi.Domain/</span>
+│   └── <span class="dir">EcommerceApi.Infrastructure/</span>
+└── <span class="dir">tests/</span>
+    ├── <span class="dir">EcommerceApi.UnitTests/</span>
+    └── <span class="dir">EcommerceApi.IntegrationTests/</span></pre>
+
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>📄 CLAUDE.md — permanent context</h4>
+          <pre># EcommerceApi
+
+## Stack
+- .NET 8 · ASP.NET Core Minimal APIs
+- Entity Framework Core 8 · SQL Server 2022
+- xUnit · Moq · FluentAssertions
+
+## Conventions
+- Use record types for DTOs and Value Objects
+- Async methods end in Async
+- Never return null: use Result&lt;T&gt; (FluentResults)
+- EF Core: AsNoTracking() on read-only queries
+- CQRS pattern: separate Commands from Queries
+
+## Restrictions
+- Never modify existing migrations — create a new migration
+- Do not use DbContext in Controllers — only in Repositories
+- Do not hardcode connection strings
+
+## Commands
+- `dotnet build`
+- `dotnet test --filter Category=Unit`
+- `dotnet ef migrations add &lt;Name&gt;`
+- `dotnet format`</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>🧩 Skill: refactor-dotnet</h4>
+          <pre>---
+name: refactor-dotnet
+description: Refactors C# / .NET 8 code. Use when asked
+             to refactor, improve or modernize classes, services
+             or C# repositories. Also when migrating to CQRS or Result&lt;T&gt;.
+---
+1. Read the full file before modifying
+2. Apply patterns described in references/patterns.md when applicable
+3. EF Core: AsNoTracking() on queries, transactions on writes
+4. When done: `dotnet build` and list changes made
+5. Indicate which new tests are needed</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>🧩 Skill: test-writer</h4>
+          <pre>---
+name: test-writer
+description: Writes .NET unit and integration tests.
+             Use when asked to create tests, add coverage
+             or test a specific method, class or endpoint.
+---
+- Framework: xUnit · Moq (MockBehavior.Strict) · FluentAssertions
+- Naming: Method_Scenario_Result
+- Structure: Arrange / Act / Assert always
+- Cover: happy path, invalid input, not found, infra error</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <h4>🪝 Hook: automatic build after each change</h4>
+          <p>In <code>.claude/settings.json</code> (goes to repo — the team shares it):</p>
+          <pre>{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{
+        "type": "command",
+        "command": "dotnet format --verify-no-changes 2>&1 | tail -3 && dotnet build --no-restore -q 2>&1 | tail -5"
+      }]
+    }]
+  }
+}</pre>
+          <div class="callout warn"><span class="callout-icon">⚠️</span><div>Make sure <code>dotnet</code> is in the system PATH, not just the interactive shell's PATH. If the hook fails with "command not found", use the absolute path to the dotnet executable.</div></div>
+        </div></div>
+
+        <div class="step"><div class="step-num">5</div><div class="step-body">
+          <h4>🔌 MCP + ⚡ /coverage-report</h4>
+          <p>In <code>.claude/settings.local.json</code> (does NOT go to repo — has the real connection string):</p>
+          <pre>{
+  "mcpServers": {
+    "staging-db": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": { "POSTGRES_URL": "postgresql://readonly:pass@staging-db:5432/ecommerce" }
+    }
+  }
+}</pre>
+          <p>In <code>.claude/commands/coverage-report.md</code>:</p>
+          <pre>Run: dotnet test --collect:"XPlat Code Coverage"
+Analyze the generated XML report and report:
+- Classes below $ARGUMENTS% coverage
+- Most critical untested methods
+- Test case suggestions for the 3 most important ones</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">6</div><div class="step-body">
+          <h4>🎯 The workflow in action</h4>
+          <pre>$ claude
+
+> "refactor OrderService.cs to use CQRS"
+# ✦ Skill refactor-dotnet active → reads references/patterns.md
+# ✦ Claude splits into CreateOrderCommandHandler + GetOrderQueryHandler
+# ✦ Hook → dotnet format + build automatic ✅
+
+> "write tests for CreateOrderCommandHandler"
+# ✦ Skill test-writer active → xUnit + Moq + 4 cases covered
+# ✦ Hook → build passes ✅
+
+> /coverage-report 80
+# ✦ Runs dotnet test with coverage
+# ✦ Application layer at 91% · 2 methods below 80% identified
+# ✦ Suggests 3 concrete tests for the uncovered methods
+
+> "review the feature/refactor-orders branch"
+# ✦ Skill pr-review active → .NET/EF Core checklist
+# ✦ Result: ✅ Approved with 1 minor naming suggestion</pre>
+        </div></div>
+
+        <div class="callout ok"><span class="callout-icon">✅</span><div>
+          <strong>Each piece in its role:</strong>
+          <ul style="margin:8px 0 0">
+            <li>📄 <strong>CLAUDE.md</strong> — gives project context always</li>
+            <li>🧩 <strong>Skills</strong> — apply specific expertise automatically without repeating instructions</li>
+            <li>📚 <strong>references/</strong> — extensive guides that only load when needed</li>
+            <li>🪝 <strong>Hook</strong> — verifies compilation without human intervention</li>
+            <li>🔌 <strong>MCP</strong> — connects to the staging DB for analysis in real context</li>
+            <li>⚡ <strong>Slash command</strong> — generates reports on demand when the developer decides</li>
+          </ul>
+        </div></div>
+      </div>
+    </div>

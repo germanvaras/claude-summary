@@ -1,0 +1,59 @@
+    <div class="section" id="section-modelos">
+      <div class="section-header"><h2>🤖 Models <span class="badge">Reference</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/about-claude/models/overview" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Choosing the right model impacts speed, quality, and cost. The general rule: Opus for complex and critical work, Sonnet for everyday development, Haiku for simple and fast tasks.</div></div>
+
+        <h3>📊 Model comparison</h3>
+        <table>
+          <thead><tr><th>Model</th><th>Intelligence</th><th>Speed</th><th>Cost</th><th>Context window</th></tr></thead>
+          <tbody>
+            <tr><td>🟣 <strong>Claude Opus 4.6</strong></td><td>⭐⭐⭐⭐⭐ Maximum</td><td>🐢 Slowest</td><td>💰💰💰 Highest</td><td>1M tokens · max output: 128K</td></tr>
+            <tr><td>🔵 <strong>Claude Sonnet 4.6</strong></td><td>⭐⭐⭐⭐ Very high</td><td>⚡ Fast</td><td>💰💰 Mid</td><td>1M tokens · max output: 64K</td></tr>
+            <tr><td>🟢 <strong>Claude Haiku 4.5</strong></td><td>⭐⭐⭐ Capable and efficient</td><td>🚀 Fastest</td><td>💰 Lowest</td><td>200K tokens · max output: 64K</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🎯 When to use each one?</h3>
+        <table>
+          <thead><tr><th>Task</th><th>Recommended model</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Complex refactoring, architecture, design decisions</td><td>🟣 Opus 4.6</td><td>Maximum capacity for critical decisions</td></tr>
+            <tr><td>Daily development: coding, PR review, debugging</td><td>🔵 Sonnet 4.6</td><td>Ideal quality / speed / cost balance</td></tr>
+            <tr><td>Critical code analysis (security, migrations)</td><td>🟣 Opus 4.6</td><td>Don't compromise quality on high-impact tasks</td></tr>
+            <tr><td>Agent in CI/CD pipelines</td><td>🔵 Sonnet 4.6</td><td>Claude Code's default model, proven for agentic use</td></tr>
+            <tr><td>Repetitive tasks: formatting, renames, boilerplate</td><td>🟢 Haiku 4.5</td><td>No need for maximum power here</td></tr>
+            <tr><td>Quick lookups, snippets, simple queries</td><td>🟢 Haiku 4.5</td><td>Minimum speed and cost</td></tr>
+          </tbody>
+        </table>
+
+        <h3>⚙️ How to change the model</h3>
+        <p>The default model in Claude Code is <strong>Sonnet</strong>. You can change it in several ways:</p>
+        <table>
+          <thead><tr><th>Method</th><th>Command</th><th>Scope</th></tr></thead>
+          <tbody>
+            <tr><td>During the session</td><td><code>/model claude-opus-4-6</code></td><td>That session only</td></tr>
+            <tr><td>At startup</td><td><code>claude --model claude-opus-4-6</code></td><td>That session only</td></tr>
+            <tr><td>In settings.json</td><td><code>"model": "claude-sonnet-4-6"</code></td><td>Permanent (User or Project scope)</td></tr>
+            <tr><td>In skill frontmatter</td><td><code>model: claude-haiku-4-5-20251001</code></td><td>Only when that skill is active</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Exact model IDs: <code>claude-opus-4-6</code> · <code>claude-sonnet-4-6</code> · <code>claude-haiku-4-5-20251001</code>. Use the full ID in configuration to avoid ambiguity.</div></div>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Haiku is version <strong>4.5</strong>, not 4.6 — they are not all from the same generation. The date suffix in <code>claude-haiku-4-5-20251001</code> is part of the official ID and is required. Using <code>claude-haiku-4-5</code> without the date or attempting <code>claude-haiku-4-6</code> may silently fail or fall back to the default model.</div></div>
+
+        <h3>💰 Tokens and cost in practice</h3>
+        <p>In Claude Code, cost is measured in tokens consumed — both input (history, files, skills, CLAUDE.md) and output (what Claude generates). The more complex the task and the more accumulated context, the more tokens each turn consumes.</p>
+        <div class="callout info"><span class="callout-icon">📌</span><div><strong>Input and output tokens are not priced the same.</strong> Output tokens cost significantly more per token than input tokens. In pipelines where Claude generates long responses (reports, extensive code, analyses), the real cost is dominated by output — not input context. Optimize response size, not just context.</div></div>
+        <table>
+          <thead><tr><th>Scenario</th><th>Ideal model</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Interactive development session</td><td>Sonnet</td><td>Many turns → accumulated cost matters</td></tr>
+            <tr><td>One critical focused task (architecture, security)</td><td>Opus</td><td>Few turns → extra cost is justified</td></tr>
+            <tr><td>Autonomous agent in CI/CD pipeline</td><td>Sonnet</td><td>Many autonomous turns with minimal intervention</td></tr>
+            <tr><td>Repetitive tasks: formatting, renames, boilerplate</td><td>Haiku</td><td>No need for maximum power → minimum cost</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div><strong>Don't use Opus for everything.</strong> A massive refactoring session with Opus can cost 10–20× more than with Sonnet for a similar result on standard tasks. Reserve Opus for when maximum intelligence truly matters.</div></div>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div>For more detail on session management, resume commands, and best practices, see the <strong>Sessions</strong> section.</div></div>
+      </div>
+    </div>

@@ -1,0 +1,90 @@
+    <div class="section" id="section-slash">
+      <div class="section-header"><h2>⚡ Slash Commands <span class="badge">Manual control</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/slash-commands" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> If skills are the autopilot, slash commands are the manual joystick. You control them, whenever you want. There are three distinct categories with different origins.</div></div>
+
+        <h3>1️⃣ Built-in commands — system commands</h3>
+        <p>Commands that Claude Code ships with by default. They do not need configuration — they are always available within a session.</p>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">/help</span></td><td class="cli-desc">Lists all available commands in the current session</td></tr>
+          <tr><td><span class="cli-cmd">/status</span></td><td class="cli-desc">Shows configuration state: active model, directory, loaded skills and permissions</td></tr>
+          <tr><td><span class="cli-cmd">/clear</span></td><td class="cli-desc">Clears the conversation history (aliases: <code>/reset</code>, <code>/new</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/compact [instructions]</span></td><td class="cli-desc">Compresses history to free context space. You can pass focus instructions: <code>/compact focus on the Orders module changes</code></td></tr>
+          <tr><td><span class="cli-cmd">/context</span></td><td class="cli-desc">Visualize token usage of the current context</td></tr>
+          <tr><td><span class="cli-cmd">/config</span></td><td class="cli-desc">Opens the configuration interface (alias: <code>/settings</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/permissions</span></td><td class="cli-desc">View and update permissions for the current session (alias: <code>/allowed-tools</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/model [model]</span></td><td class="cli-desc">View or change the model for this session</td></tr>
+          <tr><td><span class="cli-cmd">/init</span></td><td class="cli-desc">Generates an initial CLAUDE.md by analyzing the current project</td></tr>
+          <tr><td><span class="cli-cmd">/memory</span></td><td class="cli-desc">Edit CLAUDE.md files and project memory</td></tr>
+          <tr><td><span class="cli-cmd">/mcp</span></td><td class="cli-desc">View the status of connected MCP servers</td></tr>
+          <tr><td><span class="cli-cmd">/skills</span></td><td class="cli-desc">Lists all active skills for the current directory</td></tr>
+          <tr><td><span class="cli-cmd">/hooks</span></td><td class="cli-desc">View active hook configurations</td></tr>
+          <tr><td><span class="cli-cmd">/agents</span></td><td class="cli-desc">View agent configurations</td></tr>
+          <tr><td><span class="cli-cmd">/doctor</span></td><td class="cli-desc">Full diagnostic: version, authentication, connectivity</td></tr>
+          <tr><td><span class="cli-cmd">/plan [description]</span></td><td class="cli-desc">Enter planning mode — Claude describes what it would do but does not execute anything</td></tr>
+          <tr><td><span class="cli-cmd">/resume [session]</span></td><td class="cli-desc">Resume a previous conversation (alias: <code>/continue</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/exit</span></td><td class="cli-desc">Close the session (alias: <code>/quit</code>)</td></tr>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Not all built-in commands are available in all contexts. Availability depends on the plan, platform (CLI, VS Code, etc.), and installed version. Use <code>/help</code> to see which ones are active in your session.</div></div>
+
+        <h3>2️⃣ Skill commands — commands you create</h3>
+        <p>Custom commands defined in <code>.md</code> files inside <code>commands/</code> folders. A file at <code>.claude/commands/deploy.md</code> creates the <code>/deploy</code> command. The difference from a skill: the user invokes them manually, they do not activate by semantic context.</p>
+        <table>
+          <thead><tr><th>Type</th><th>Location</th><th>Scope</th></tr></thead>
+          <tbody>
+            <tr><td>Personal</td><td><code>~/.claude/commands/name.md</code></td><td>All your projects</td></tr>
+            <tr><td>Project</td><td><code>.claude/commands/name.md</code></td><td>Shared with the team on clone</td></tr>
+          </tbody>
+        </table>
+
+        <h4>Custom command structure:</h4>
+        <pre># .claude/commands/daily-standup.md
+
+Generate a standup summary based on:
+1. Commits from the last 24 hours
+2. Modified files
+3. New TODOs or FIXMEs
+
+## ✅ What I did yesterday
+## 🎯 What I'm doing today
+## 🚧 Blockers or questions</pre>
+
+        <p>The user invokes it simply with:</p>
+        <pre>/daily-standup</pre>
+
+        <h4>Passing arguments with $ARGUMENTS:</h4>
+        <p>Use <code>$ARGUMENTS</code> to capture all the text that follows the command name:</p>
+        <pre># .claude/commands/review.md
+
+Review the code on the $ARGUMENTS branch:
+1. Check naming conventions
+2. Review error handling and edge cases
+3. Verify there are sufficient tests
+4. List required changes or approve</pre>
+
+        <p>Invocation:</p>
+        <pre>/review feature/login
+# $ARGUMENTS = "feature/login"
+
+/review feature/order-refactor --strict
+# $ARGUMENTS = "feature/order-refactor --strict"</pre>
+        <div class="callout info"><span class="callout-icon">📌</span><div><code>$ARGUMENTS</code> captures <em>everything</em> that follows the command name as a string. If you need multiple parameters, you can use your own conventions within the command text (e.g. parse by space or dash) and describe the expected format in the command file.</div></div>
+
+        <h3>3️⃣ MCP prompts — commands from external servers</h3>
+        <p>MCP servers can expose predefined prompts that appear as slash commands in the format <code>/mcp__&lt;server&gt;__&lt;prompt&gt;</code>. They are provided by the server — you do not create them.</p>
+        <pre>/mcp__github__create-pr
+/mcp__postgres__explain-query
+/mcp__slack__post-summary</pre>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Available MCP prompts appear in <code>/help</code> when the corresponding MCP server is connected and active.</div></div>
+
+        <h3>⚖️ When do I use a slash command vs a skill?</h3>
+        <table>
+          <thead><tr><th>Criterion</th><th>Slash Command</th><th>Skill</th></tr></thead>
+          <tbody>
+            <tr><td>Who decides when to run it?</td><td>The user (manual invocation)</td><td>Claude (automatic activation by context)</td></tr>
+            <tr><td>Do you need to pass parameters?</td><td>Yes, via $ARGUMENTS</td><td>No — the conversation context is the parameter</td></tr>
+            <tr><td>Typical use case</td><td>Generate changelog, coverage report, standup</td><td>PR reviews, refactoring, writing tests</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

@@ -1,0 +1,90 @@
+    <div class="section" id="section-auth">
+      <div class="section-header"><h2>🔑 Authentication <span class="badge">Configuration</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/authentication" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Claude Code supports two authentication methods: browser login (for interactive use) and API key via environment variable (for CI/CD, servers, or headless environments).</div></div>
+
+        <h3>🌐 Method 1 — Browser login (interactive use)</h3>
+        <p>This is the default method. When running <code>claude</code> for the first time, it opens the browser to sign in with your Anthropic account.</p>
+
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Run Claude Code</h4>
+          <pre>claude</pre>
+          <p>If there is no active session, it displays a message and opens the browser automatically.</p>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Approve in the browser</h4>
+          <p>Sign in at <strong>claude.ai</strong> with your Anthropic account and approve access for Claude Code.</p>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Token stored locally</h4>
+          <p>The session token is saved to:</p>
+          <table>
+            <thead><tr><th>OS</th><th>Location</th></tr></thead>
+            <tbody>
+              <tr><td>Windows</td><td><code>C:\Users\&lt;user&gt;\.claude\credentials.json</code></td></tr>
+              <tr><td>macOS / Linux</td><td><code>~/.claude/credentials.json</code></td></tr>
+            </tbody>
+          </table>
+          <p>Subsequent runs reuse this token automatically — no need to log in again.</p>
+        </div></div>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>If the token expires or the account changes, run <code>claude logout</code> and log in again. In shared environments (servers, CI), never use browser login — use an API key instead.</div></div>
+
+        <h3>🔐 Method 2 — API Key (CI/CD, servers, headless environments)</h3>
+        <p>If you set the <code>ANTHROPIC_API_KEY</code> environment variable, Claude Code uses it automatically without requiring browser login. This method is required in automated environments.</p>
+
+        <h4>Getting an API key</h4>
+        <p>Go to <strong>console.anthropic.com</strong> → API Keys → Create Key. Keys begin with <code>sk-ant-api03-...</code></p>
+
+        <h4>Setting up on Windows</h4>
+        <p><strong>Current session only:</strong></p>
+        <pre>$env:ANTHROPIC_API_KEY = "sk-ant-api03-..."</pre>
+        <p><strong>Permanent for your user:</strong></p>
+        <pre>setx ANTHROPIC_API_KEY "sk-ant-api03-..."</pre>
+        <p>After <code>setx</code>, close and reopen the terminal for it to take effect.</p>
+
+        <h4>Verify Claude is using the key</h4>
+        <pre>claude --version   # should respond without prompting for login
+/doctor            # shows "API key: configured"</pre>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div>If both <code>ANTHROPIC_API_KEY</code> and <code>credentials.json</code> are present, the environment variable takes priority.</div></div>
+
+        <h3>🔒 Security best practices</h3>
+        <table>
+          <thead><tr><th>Context</th><th>Recommended method</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Local interactive development</td><td>Browser login</td><td>No credentials in files or variables</td></tr>
+            <tr><td>CI/CD (GitHub Actions, etc.)</td><td>Repository secret → env var</td><td>Key is not exposed in logs or code</td></tr>
+            <tr><td>Team server</td><td>System environment variable, managed by IT</td><td>Centralized control, not in code</td></tr>
+            <tr><td>Docker / containers</td><td>Environment variable injected at run time</td><td><code>docker run -e ANTHROPIC_API_KEY=... ...</code></td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Never do this:</strong>
+          <ul style="margin:6px 0 0">
+            <li>Store the API key in the project's <code>settings.json</code> (it goes to the repository)</li>
+            <li>Hardcode the key in scripts or source code</li>
+            <li>Share <code>~/.claude/credentials.json</code></li>
+          </ul>
+        </div></div>
+
+        <h3>🚀 First use — complete flow from scratch</h3>
+        <p>Once authenticated, this is the typical flow to start working on a project:</p>
+        <pre># 1. Go to the project directory
+cd C:\my-projects\my-api
+
+# 2. Start Claude Code
+claude
+
+# 3. If the project has no CLAUDE.md, generate one
+/init
+
+# 4. Verify everything loaded correctly
+/status
+/skills
+
+# 5. Start the first task
+"explain the project architecture"</pre>
+        <div class="callout ok"><span class="callout-icon">✅</span><div>You're now operational. The CLAUDE.md generated by <code>/init</code> gives Claude the project context from the very first message.</div></div>
+      </div>
+    </div>

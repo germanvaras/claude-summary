@@ -1,0 +1,57 @@
+    <div class="section" id="section-scopes">
+      <div class="section-header"><h2>🗂️ Configuration Scopes <span class="badge">Reference</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/settings" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Claude Code has four configuration levels. Understanding which applies in each context defines what gets committed to the repo, what is personal, and what the organization manages.</div></div>
+
+        <h3>📐 The four scopes</h3>
+        <table>
+          <thead><tr><th>Scope</th><th>File</th><th>Committed?</th><th>Who controls it</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>🏢 <strong>Managed</strong></td>
+              <td>Central organization configuration</td>
+              <td>—</td>
+              <td>IT / Admins. Overrides everything. Not editable by the user.</td>
+            </tr>
+            <tr>
+              <td>👤 <strong>User</strong></td>
+              <td><code>~/.claude/settings.json</code></td>
+              <td>❌ No — it's personal</td>
+              <td>You. Applies to all your projects. Personal preferences, API keys, global hooks.</td>
+            </tr>
+            <tr>
+              <td>📁 <strong>Project</strong></td>
+              <td><code>.claude/settings.json</code></td>
+              <td>✅ Yes — goes to the repo</td>
+              <td>The team. Hooks, MCP, permissions, and shared skills. Inherited by everyone who clones.</td>
+            </tr>
+            <tr>
+              <td>🔒 <strong>Local</strong></td>
+              <td><code>.claude/settings.local.json</code></td>
+              <td>❌ No — Claude Code adds it to .gitignore automatically</td>
+              <td>You, per project. Higher priority than Project and User. Local overrides: connection strings, dev tokens, personal per-repo prefs.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Never put secrets (tokens, passwords, real connection strings) in <code>.claude/settings.json</code> — that file goes to the repository. Always use <code>.claude/settings.local.json</code> for sensitive values.</div></div>
+
+        <h3>🔁 Precedence order</h3>
+        <p>When there is a conflict between scopes, the precedence order (highest to lowest) is:</p>
+        <pre>Managed  &gt;  Local  &gt;  Project  &gt;  User</pre>
+        <p><strong>Local overrides Project and User</strong> — it is the personal per-repository override. A <code>deny</code> rule in Managed cannot be overridden by any other scope.</p>
+
+        <h3>📋 What goes in each scope — practical guide</h3>
+        <table>
+          <thead><tr><th>What to configure?</th><th>Recommended scope</th></tr></thead>
+          <tbody>
+            <tr><td>Project linting/build hooks</td><td>📁 Project (<code>.claude/settings.json</code>)</td></tr>
+            <tr><td>Project MCP servers (staging DB, GitHub)</td><td>📁 Project (<code>.claude/settings.json</code>)</td></tr>
+            <tr><td>Real local database connection string</td><td>🔒 Local (<code>.claude/settings.local.json</code>)</td></tr>
+            <tr><td>Personal GitHub token or API keys</td><td>👤 User (<code>~/.claude/settings.json</code>)</td></tr>
+            <tr><td>Model or response format preferences</td><td>👤 User (<code>~/.claude/settings.json</code>)</td></tr>
+            <tr><td>Security restrictions for the entire organization</td><td>🏢 Managed (centrally administered)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

@@ -62,31 +62,11 @@
         <table>
           <thead><tr><th>Problema</th><th>Causa</th><th>Solución</th></tr></thead>
           <tbody>
-            <tr>
-              <td><code>claude</code> no encontrado (instalación npm)</td>
-              <td>PATH no incluye la carpeta npm global</td>
-              <td>Cerrá y abrí la terminal. Si persiste: verificá que <code>%APPDATA%\npm</code> esté en el PATH del sistema (Panel de control → Variables de entorno).</td>
-            </tr>
-            <tr>
-              <td><code>claude</code> no encontrado (instalador nativo)</td>
-              <td>PATH no recargado en la sesión actual</td>
-              <td>Cerrá y abrí la terminal. Si persiste, reinstalá con el script oficial.</td>
-            </tr>
-            <tr>
-              <td>El script de instalación falla en PowerShell</td>
-              <td>Política de ejecución de scripts bloqueada</td>
-              <td>Ejecutá primero: <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code>. Luego volvé a correr el instalador.</td>
-            </tr>
-            <tr>
-              <td>Falla en redes corporativas</td>
-              <td>Proxy bloqueando el script o la API de Anthropic</td>
-              <td>Usá WinGet: <code>winget install Anthropic.ClaudeCode</code>. Para la API, consultá con el área de infraestructura sobre el proxy y la autenticación via API key.</td>
-            </tr>
-            <tr>
-              <td>Visual Studio no encuentra <code>claude</code></td>
-              <td>El terminal de VS puede tener un PATH diferente al del sistema</td>
-              <td>Usá el terminal integrado de VS Code, o abrí PowerShell externo, navegá al directorio del proyecto con <code>cd</code> y ejecutá <code>claude</code> desde ahí.</td>
-            </tr>
+            <tr><td><code>claude</code> no encontrado (instalación npm)</td><td>PATH no incluye la carpeta npm global</td><td>Cerrá y abrí la terminal. Si persiste: verificá que <code>%APPDATA%\npm</code> esté en el PATH del sistema.</td></tr>
+            <tr><td><code>claude</code> no encontrado (instalador nativo)</td><td>PATH no recargado en la sesión actual</td><td>Cerrá y abrí la terminal. Si persiste, reinstalá con el script oficial.</td></tr>
+            <tr><td>El script de instalación falla en PowerShell</td><td>Política de ejecución de scripts bloqueada</td><td>Ejecutá primero: <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code>. Luego volvé a correr el instalador.</td></tr>
+            <tr><td>Falla en redes corporativas</td><td>Proxy bloqueando el script o la API de Anthropic</td><td>Usá WinGet: <code>winget install Anthropic.ClaudeCode</code>.</td></tr>
+            <tr><td>Visual Studio no encuentra <code>claude</code></td><td>El terminal de VS puede tener un PATH diferente al del sistema</td><td>Usá el terminal integrado de VS Code, o abrí PowerShell externo.</td></tr>
           </tbody>
         </table>
 
@@ -101,5 +81,3 @@
         <div class="callout ok"><span class="callout-icon">✅</span><div>Si <code>/skills</code> lista las skills del proyecto y <code>/doctor</code> no reporta errores, Claude está listo para trabajar.</div></div>
       </div>
     </div>
-
-    <!-- ══ AUTENTICACIÓN ══ -->

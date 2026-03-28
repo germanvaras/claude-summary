@@ -241,3 +241,17 @@
     /* Ajustar variable para scroll-padding-top en pantallas donde el header es más chico */
     :root { --header-h: 72px; }
   }
+
+  /* ══ DOC LINK BADGE ══ */
+  .doc-link { display: inline-flex; align-items: center; gap: 3px; background: transparent; border: 1.5px solid var(--violet); color: var(--plum); font-size: 0.65rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-left: 6px; vertical-align: middle; letter-spacing: .04em; text-decoration: none; transition: all .15s; white-space: nowrap; }
+  .doc-link:hover { background: var(--violet); color: #fff; }
+
+  /* ══ LANGUAGE SWITCHER ══ */
+  .lang-switcher { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto; }
+  .lang-btn { background: none; border: 1.5px solid #555; color: #aaa; padding: 4px 12px; border-radius: 4px; font-size: 0.78rem; font-weight: 700; cursor: pointer; letter-spacing: .06em; transition: all .15s; }
+  .lang-btn:hover { border-color: var(--violet); color: var(--violet); }
+  .lang-btn.active { background: var(--violet); border-color: var(--violet); color: #fff; }
+  .lang-sep { color: #444; font-size: 0.8rem; }
+  @media (max-width: 768px) {
+    .lang-switcher { order: 1; margin-left: auto; }
+  }

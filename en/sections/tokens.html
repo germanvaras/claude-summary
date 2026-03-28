@@ -1,0 +1,77 @@
+    <div class="section" id="section-tokens">
+      <div class="section-header"><h2>🪙 Tokens &amp; Context <span class="badge">Fundamental</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/about-claude/models/overview" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Understanding tokens and context means understanding Claude's real limits. Everything else — skills, CLAUDE.md, subagents — exists partly to manage this finite resource.</div></div>
+
+        <h3>🔢 What is a token?</h3>
+        <p>A token is the minimum unit the model processes. It is not a word or a character — it is a fragment that can be part of a word, a whole word, or a punctuation mark. The tokenizer splits text before sending it to the model.</p>
+        <table>
+          <thead><tr><th>Text</th><th>Approx. tokens</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td>A simple line of code</td><td>~10–20</td><td>Varies significantly by language</td></tr>
+            <tr><td>A paragraph of text</td><td>~100–150</td><td>—</td></tr>
+            <tr><td>A 500-word CLAUDE.md (English)</td><td>~700</td><td>In Spanish: ~850–1,000 due to higher token density</td></tr>
+            <tr><td>A 300-line code file</td><td>~2,500–4,000</td><td>Depends on density</td></tr>
+            <tr><td>5 medium-sized files open at once</td><td>~12,000–20,000</td><td>How context fills up fast in real tasks</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Claude's tokenizer is optimized for English. The same text in Spanish or other languages generally consumes <strong>more tokens</strong> than in English — meaning it is less efficient.</div></div>
+
+        <h3>📦 The context window</h3>
+        <p>The context window is the model's "workspace" — everything Claude can "see" at once: conversation history, read files, CLAUDE.md, active skills, and tool results. <strong>It is finite.</strong> Everything shares the same space.</p>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Current Claude models have different context windows: <strong>Opus 4.6 and Sonnet 4.6 have 1,000,000 tokens (1M)</strong>; <strong>Haiku 4.5 has 200,000 tokens</strong>. This budget covers history, files, CLAUDE.md, and skills (input) plus the generated response (output). In interactive use it is rarely a problem. In pipelines with heavy generation, the per-response output limit is the real practical ceiling: <strong>Opus 4.6 up to 128K tokens, Sonnet 4.6 and Haiku 4.5 up to 64K tokens</strong>.</div></div>
+
+        <h3>🫧 What happens when the context fills up?</h3>
+        <p>Claude does not give an explicit error — what happens is more subtle and harder to detect:</p>
+
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Gradual degradation</h4>
+          <p>Claude begins to lose focus on instructions from early in the conversation. CLAUDE.md may fall out of the "effective focus" even though it is technically still loaded. Responses become more generic and less precise.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Loss of coherence</h4>
+          <p>Claude begins to contradict itself: it applies different conventions than those established, repeats questions you already answered, or ignores CLAUDE.md restrictions defined at the start of the session.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Hard cutoff</h4>
+          <p>In extreme cases, the API rejects the request because it exceeds the maximum limit. An explicit error appears. This is the least frequent case.</p>
+        </div></div>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Claude "forgetting" things in long sessions is almost never a model bug — it is the loaded context. Before assuming Claude "doesn't understand," use <code>/compact</code> to compress the history, or start a new session with just <code>claude</code>. Use <code>claude -c</code> only if you want to <em>resume</em> the previous session where it left off — it is not a new session.</div></div>
+
+        <h3>🗜️ /compact — the key tool</h3>
+        <p>The <code>/compact</code> command compresses the conversation history: the model generates a dense summary of what was discussed and replaces the full history with that summary. The result: frees context space without losing the thread of the task.</p>
+        <table>
+          <thead><tr><th></th><th><code>/compact</code></th><th>New session</th></tr></thead>
+          <tbody>
+            <tr><td>Frees context</td><td>✅ Yes</td><td>✅ Yes</td></tr>
+            <tr><td>Keeps task thread</td><td>✅ Yes (summarized)</td><td>❌ No</td></tr>
+            <tr><td>Keeps CLAUDE.md and skills</td><td>✅ Yes</td><td>✅ Yes</td></tr>
+            <tr><td>When to use it</td><td>Long session with accumulated context</td><td>Completely new task</td></tr>
+          </tbody>
+        </table>
+        <pre>/compact
+
+# You can also pass focus instructions:
+/compact focus on the changes in the Orders module</pre>
+
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Don't wait for the context to explode.</strong> Compact proactively when you feel the session has been running a while and Claude is starting to lose focus — not as a last-resort rescue.</div></div>
+
+        <h3>🏆 Strategies for managing context</h3>
+        <table>
+          <thead><tr><th>Strategy</th><th>How</th><th>Impact</th></tr></thead>
+          <tbody>
+            <tr><td>📄 Concise CLAUDE.md</td><td>Under 200 lines, no filler</td><td>Frees tokens in every conversation</td></tr>
+            <tr><td>🧩 Progressive disclosure</td><td>Extensive material in <code>references/</code>, short SKILL.md</td><td>Only loads context when needed</td></tr>
+            <tr><td>🗜️ Proactive /compact</td><td>Compact before the context fills up</td><td>Maintains coherence in long sessions</td></tr>
+            <tr><td>🤖 Subagents</td><td>Delegate independent tasks to separate contexts</td><td>The main agent doesn't accumulate all the work</td></tr>
+            <tr><td>✂️ Short sessions</td><td>One session = one concrete objective</td><td>Avoids unnecessary accumulation</td></tr>
+            <tr><td>📁 Don't over-read</td><td>Let Claude request files when it needs them</td><td>Each Read consumes context tokens</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout ok"><span class="callout-icon">✅</span><div><strong>Golden rule:</strong> The context is a shared resource between you, Claude, and the project. Managing CLAUDE.md, skills, and session length well is just as important as writing good code.</div></div>
+      </div>
+    </div>

@@ -1,0 +1,52 @@
+    <div class="section" id="section-modelo">
+      <div class="section-header"><h2>🧠 Mental Model <span class="badge">Where to start</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Before diving into the details:</strong> understand what each piece does. Once this is clear, the rest of the documentation will fall into place.</div></div>
+
+        <h3>🗺️ The complete map</h3>
+        <table>
+          <thead><tr><th>Piece</th><th>Role</th><th>When it applies</th></tr></thead>
+          <tbody>
+            <tr><td>📄 <strong>CLAUDE.md</strong></td><td>Persistent project memory</td><td>Always — loads automatically at the start of every conversation</td></tr>
+            <tr><td>🧩 <strong>Skills</strong></td><td>Activatable specialized knowledge</td><td>When the task semantically matches the skill's description</td></tr>
+            <tr><td>🪝 <strong>Hooks</strong></td><td>Event-driven automations</td><td>When Claude does something: writes a file, runs a command, finishes</td></tr>
+            <tr><td>🔌 <strong>MCP Servers</strong></td><td>Connection to external tools</td><td>When you need APIs, databases, or third-party services</td></tr>
+            <tr><td>🔐 <strong>Permissions</strong></td><td>Security guardrails</td><td>Defines what Claude can and cannot do in each context</td></tr>
+            <tr><td>⚡ <strong>Slash Commands</strong></td><td>Explicit manual actions</td><td>When you decide to run something, with full control over timing</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🔗 How they relate</h3>
+        <pre>Each conversation with Claude Code
+│
+├── Loaded automatically on start
+│   ├── CLAUDE.md          → permanent project context
+│   └── Relevant skills    → specialized knowledge per task
+│
+├── Triggered automatically (event-driven)
+│   └── Hooks              → react to what Claude does
+│
+├── You activate manually
+│   └── Slash Commands     → /deploy, /changelog, /standup
+│
+├── Available as tools
+│   └── MCP Servers        → APIs, DBs, external services
+│
+└── Always-active guardrails
+    └── Permissions        → what Claude can and cannot do</pre>
+
+        <h3>🎯 Quick decision rule</h3>
+        <table>
+          <thead><tr><th>Need</th><th>Solution</th></tr></thead>
+          <tbody>
+            <tr><td>Claude knows nothing about the project</td><td>📄 Write a <strong>CLAUDE.md</strong> with context</td></tr>
+            <tr><td>Claude doesn't know <em>how</em> to do something</td><td>🧩 Create a <strong>Skill</strong> with the instructions</td></tr>
+            <tr><td>You want something to happen automatically</td><td>🪝 Configure a <strong>Hook</strong> for that event</td></tr>
+            <tr><td>You need to connect to an API or DB</td><td>🔌 Add an <strong>MCP Server</strong></td></tr>
+            <tr><td>You want to run something on demand</td><td>⚡ Create a <strong>Slash Command</strong></td></tr>
+            <tr><td>Claude does things it shouldn't</td><td>🔐 Configure <strong>Permissions</strong> in settings.json</td></tr>
+          </tbody>
+        </table>
+        <div class="callout ok"><span class="callout-icon">✅</span><div>These pieces are <strong>complementary, not alternatives</strong>. A well-configured project uses all of them: CLAUDE.md provides context, skills provide knowledge, hooks provide automation, MCP provides external connections, and permissions provide security.</div></div>
+      </div>
+    </div>

@@ -1,0 +1,58 @@
+    <div class="section" id="section-sesiones">
+      <div class="section-header"><h2>🏷️ Sessions <span class="badge">Workflow</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/sessions" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> One session = one task. Keeping sessions separate by objective keeps context clean, reduces cost per turn, and lets you resume work exactly where you left off.</div></div>
+
+        <h3>🔄 Session commands</h3>
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th><th>When to use it</th></tr></thead>
+          <tbody>
+            <tr><td><code>claude</code></td><td>Starts a new session with clean context</td><td>Every time you start a new task</td></tr>
+            <tr><td><code>claude -c</code><br><code>claude --continue</code></td><td>Resumes the last active session from where it left off</td><td>You want to continue what you were doing</td></tr>
+            <tr><td><code>claude -r &lt;session-id&gt;</code><br><code>claude --resume &lt;session-id&gt;</code></td><td>Resumes a specific session by its ID</td><td>You want to return to a previous task, not the last one</td></tr>
+            <tr><td><code>claude -n &lt;name&gt;</code><br><code>claude --session-name &lt;name&gt;</code></td><td>Starts a new session with a custom name</td><td>You want to easily identify the session without relying on the auto-generated ID</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🏷️ How to identify and resume sessions</h3>
+        <p>Each session has a unique auto-generated ID. To be able to resume a specific session later:</p>
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <h4>Describe the objective at the start</h4>
+          <p>The first message of the session is the context anchor. If you write it clearly — what you're building, what constraints exist, what you've decided — when you resume with <code>--resume</code>, Claude picks up the thread without you having to re-explain everything.</p>
+          <pre>> "I'm migrating the authentication module from JWT to OAuth2.
+> Stack: Node.js + Express. User model is done.
+> Remaining: token validation middleware and protected routes."</pre>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <h4>Find the session-id</h4>
+          <p>The session ID appears in the Claude Code prompt at startup or when listing sessions. You can also use:</p>
+          <pre>claude --list-sessions</pre>
+          <p>This shows recent sessions with their ID, date, and first message.</p>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <h4>Resume with the ID or name</h4>
+          <pre>claude --resume abc123def       # by auto-generated ID
+claude --resume my-task         # by name assigned with -n</pre>
+          <p>Claude loads the full history of that session and continues as if there had been no interruption.</p>
+        </div></div>
+
+        <h3>🗜️ Long session: use /compact before resuming</h3>
+        <p>If a session has many accumulated turns, it is worth compressing it before resuming with <code>--resume</code>. This way, the loaded context is dense and relevant, not the raw full history.</p>
+        <pre>/compact focus on the current state of the auth module</pre>
+
+        <h3>✂️ Why one session per task</h3>
+        <table>
+          <thead><tr><th></th><th>One session per task</th><th>Everything in one session</th></tr></thead>
+          <tbody>
+            <tr><td>Context</td><td>✅ Clean and relevant</td><td>❌ Accumulated from previous tasks</td></tr>
+            <tr><td>Cost per turn</td><td>✅ Lower (fewer input tokens)</td><td>❌ Grows with each new task</td></tr>
+            <tr><td>Claude coherence</td><td>✅ Focused on the current task</td><td>❌ Risk of mixing context from different tasks</td></tr>
+            <tr><td>Ability to resume</td><td>✅ Resume exactly that task</td><td>❌ Hard to know where each thing was left</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div><strong>Verify flags in your version.</strong> The <code>--resume</code> and <code>--list-sessions</code> commands are documented in the CLI. You can always run <code>claude --help</code> to see all available flags in your installed version.</div></div>
+      </div>
+    </div>

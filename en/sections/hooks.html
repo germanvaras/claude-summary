@@ -1,0 +1,148 @@
+    <div class="section" id="section-hooks">
+      <div class="section-header"><h2>🪝 Hooks <span class="badge">Automation</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/hooks" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Hooks are event-driven automations — they trigger on their own when Claude does something, without you asking. Configure once, works always.</div></div>
+
+        <h3>🔔 Available events</h3>
+        <table>
+          <thead><tr><th>Event</th><th>When it fires</th><th>Typical use case</th></tr></thead>
+          <tbody>
+            <tr><td><code>PreToolUse</code></td><td>Just before Claude uses a tool</td><td>Validate parameters, block dangerous commands, audit logging</td></tr>
+            <tr><td><code>PostToolUse</code></td><td>After Claude uses a tool (success)</td><td>Run linter or build after writing/editing, notifications</td></tr>
+            <tr><td><code>Notification</code></td><td>When Claude sends a notification to the user</td><td>Logging, external alerts, Slack integration</td></tr>
+            <tr><td><code>Stop</code></td><td>When Claude finishes responding</td><td>Cleanup, post-task reports, completion notifications</td></tr>
+            <tr><td><code>UserPromptSubmit</code></td><td>When the user submits a message</td><td>Automatically enrich the prompt, input auditing</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🏗️ Structure in settings.json</h3>
+        <pre>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "npm run lint" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "/absolute/path/validate.sh" }
+        ]
+      }
+    ]
+  }
+}</pre>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div>The <code>matcher</code> field is a <strong>regular expression</strong> compared against the tool name. The <code>|</code> operator works as regex OR: <code>"Write|Edit"</code> activates the hook on <code>Write</code> or <code>Edit</code>. Omitting <code>matcher</code> makes the hook fire on any tool.</div></div>
+
+        <h3>📥 What information the hook receives</h3>
+        <p>Claude Code passes the event information to the hook process <strong>via stdin</strong> as JSON. The hook can read that JSON to know exactly what Claude did.</p>
+
+        <p><strong>Structure for PreToolUse and PostToolUse:</strong></p>
+        <pre># stdin received by the hook:
+{
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/src/OrderService.cs",
+    "content": "..."
+  }
+}
+
+# For PostToolUse, also includes the response:
+{
+  "tool_name": "Write",
+  "tool_input": { "file_path": "..." },
+  "tool_response": { "success": true }
+}</pre>
+
+        <p>Example hook script using this information:</p>
+        <pre>#!/bin/bash
+# validate-before-write.sh
+INPUT=$(cat)   # reads the JSON from stdin
+FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path')
+
+if [[ "$FILE" == *"migrations"* ]]; then
+  echo "ERROR: Migration files cannot be modified directly."
+  exit 2   # exit 2 = BLOCK the action
+fi
+
+exit 0   # exit 0 = ALLOW the action</pre>
+
+        <h3>🚦 How PreToolUse can block actions</h3>
+        <p>A <code>PreToolUse</code> hook can decide whether Claude can execute the tool, based on its exit code:</p>
+        <table>
+          <thead><tr><th>Exit code</th><th>Behavior</th><th>When to use it</th></tr></thead>
+          <tbody>
+            <tr><td><code>0</code></td><td>Action allowed, Claude continues normally</td><td>Successful validation</td></tr>
+            <tr><td><code>2</code></td><td>Action <strong>blocked</strong>. What the hook wrote to stdout is shown to Claude as an explanation.</td><td>When you detect something Claude should not execute</td></tr>
+            <tr><td>Other (&ne;0, &ne;2)</td><td>Hook error — Claude receives an error notification but may continue</td><td>Unexpected script failure</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout ok"><span class="callout-icon">✅</span><div>What the hook writes to <strong>stdout</strong> with exit 2 reaches Claude as feedback. Claude reads it and can adjust its plan. Write clear messages: <em>"Migration file protected — use the create-migration.sh script"</em>.</div></div>
+
+        <h3>❌ What happens when a hook fails</h3>
+        <table>
+          <thead><tr><th>Hook type</th><th>If it fails (exit code other than 0 and 2)</th></tr></thead>
+          <tbody>
+            <tr><td><code>PreToolUse</code></td><td>Claude receives a hook error notification. The action may continue or stop depending on configuration.</td></tr>
+            <tr><td><code>PostToolUse</code></td><td>Claude receives the error output and can react — for example, if the linter fails, Claude can see the errors and attempt to fix them.</td></tr>
+            <tr><td><code>Stop</code></td><td>The error is logged but does not interrupt the flow — the end hook cannot undo what Claude already did.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🛣️ Environment variables in hooks</h3>
+        <p>Hooks run with the <strong>system PATH</strong>, not the interactive shell's PATH. This causes most "command not found" errors in hooks. Practical rules:</p>
+        <ul>
+          <li>Use <strong>absolute paths</strong> for executables: <code>/usr/local/bin/npm</code> instead of <code>npm</code></li>
+          <li>If the command needs to be in the project directory, prefix with <code>cd /project/path &amp;&amp; </code></li>
+          <li>Hooks inherit the environment variables of the Claude Code process, including those from your terminal session</li>
+          <li>On Windows, use <code>where npm</code> to find the full path and use it in the hook</li>
+        </ul>
+        <pre># ❌ May fail — npm is not in the hook's PATH
+"command": "npm run lint"
+
+# ✅ Absolute path — always works
+"command": "C:\\Users\\user\\AppData\\Roaming\\npm\\npm.cmd run lint"
+
+# ✅ Or change to the project directory first
+"command": "cd C:\\project &amp;&amp; npm run lint"</pre>
+
+        <h3>📋 Practical examples</h3>
+
+        <h4>Automatic linter after editing TypeScript files:</h4>
+        <pre>{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{ "type": "command", "command": "npx eslint --fix {tool_input.file_path}" }]
+    }]
+  }
+}</pre>
+
+        <h4>Automatic build after .NET changes:</h4>
+        <pre>{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{ "type": "command", "command": "dotnet build --no-restore -q 2>&amp;1 | tail -5" }]
+    }]
+  }
+}</pre>
+
+        <h4>Notification when a long task finishes:</h4>
+        <pre>{
+  "hooks": {
+    "Stop": [{
+      "hooks": [{ "type": "command", "command": "powershell -Command \"[System.Media.SystemSounds]::Beep.Play()\"" }]
+    }]
+  }
+}</pre>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Hooks run real commands on the system. Test them with <code>claude --verbose</code> in development environments before using them in production. A badly written <code>PreToolUse</code> hook can block all Claude operations.</div></div>
+      </div>
+    </div>

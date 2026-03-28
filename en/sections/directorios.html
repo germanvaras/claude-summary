@@ -1,16 +1,16 @@
     <div class="section" id="section-directorios">
-      <div class="section-header"><h2>📁 Directorios <span class="badge">Referencia</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/settings" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="section-header"><h2>📁 Directories <span class="badge">Reference</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/settings" target="_blank" rel="noopener">↗ Docs</a></h2></div>
       <div class="content">
-        <div class="callout info"><span class="callout-icon">📌</span><div>Estructura de directorios de Claude Code: dónde vive cada archivo, qué alcance tiene y ejemplos reales.</div></div>
-        <h3>🏠 Configuración personal (global)</h3>
+        <div class="callout info"><span class="callout-icon">📌</span><div>Claude Code directory structure: where each file lives, what scope it has, and real examples.</div></div>
+        <h3>🏠 Personal configuration (global)</h3>
         <pre class="dir-tree"><span class="dir">~/.claude/</span>
-├── <span class="file">CLAUDE.md</span>             <span class="note"># Instrucciones personales globales</span>
-├── <span class="file">settings.json</span>         <span class="note"># Configuración global (hooks, MCP, permisos)</span>
+├── <span class="file">CLAUDE.md</span>             <span class="note"># Global personal instructions</span>
+├── <span class="file">settings.json</span>         <span class="note"># Global config (hooks, MCP, permissions)</span>
 ├── <span class="dir">skills/</span>
 │   ├── <span class="dir">commit-message/</span>
-│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Skill personal: formato de commits</span>
+│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Personal skill: commit format</span>
 │   ├── <span class="dir">code-explain/</span>
-│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Skill personal: cómo explicar código</span>
+│   │   └── <span class="file">SKILL.md</span>       <span class="note"># Personal skill: how to explain code</span>
 │   └── <span class="dir">debug-helper/</span>
 │       ├── <span class="file">SKILL.md</span>
 │       └── <span class="dir">references/</span>
@@ -18,11 +18,11 @@
 └── <span class="dir">commands/</span>
     ├── <span class="file">standup.md</span>            <span class="note"># /standup</span>
     └── <span class="file">changelog.md</span>          <span class="note"># /changelog</span></pre>
-        <h3>🏢 Configuración de proyecto</h3>
-        <pre class="dir-tree"><span class="dir">mi-proyecto/</span>
-├── <span class="file">CLAUDE.md</span>                  <span class="note"># Instrucciones del proyecto</span>
+        <h3>🏢 Project configuration</h3>
+        <pre class="dir-tree"><span class="dir">my-project/</span>
+├── <span class="file">CLAUDE.md</span>                  <span class="note"># Project instructions</span>
 ├── <span class="dir">.claude/</span>
-│   ├── <span class="file">settings.json</span>          <span class="note"># Hooks y MCP del proyecto</span>
+│   ├── <span class="file">settings.json</span>          <span class="note"># Project hooks and MCP</span>
 │   ├── <span class="dir">skills/</span>
 │   │   ├── <span class="dir">pr-review/</span>
 │   │   │   ├── <span class="file">SKILL.md</span>
@@ -36,9 +36,9 @@
 │       ├── <span class="file">release.md</span>
 │       └── <span class="file">audit.md</span>
 └── <span class="dir">src/</span>
-    ├── <span class="file">CLAUDE.md</span>              <span class="note"># Instrucciones del módulo src/</span>
+    ├── <span class="file">CLAUDE.md</span>              <span class="note"># Instructions for the src/ module</span>
     └── <span class="note">...</span></pre>
-        <h3>⚙️ Anatomía de settings.json</h3>
+        <h3>⚙️ Anatomy of settings.json</h3>
         <pre>{
   "permissions": {
     "allow": ["Read", "Bash(git *)", "Bash(npm run *)"],
@@ -58,17 +58,15 @@
     }
   }
 }</pre>
-        <h3>📐 Precedencia</h3>
+        <h3>📐 Precedence</h3>
         <table>
-          <thead><tr><th>Nivel</th><th>Archivo</th><th>Prevalece sobre…</th></tr></thead>
+          <thead><tr><th>Level</th><th>File</th><th>Overrides…</th></tr></thead>
           <tbody>
-            <tr><td>🏢 Managed</td><td>Configuración central de la org</td><td>Todo — no puede ser anulada</td></tr>
-            <tr><td>🔒 Local</td><td><code>.claude/settings.local.json</code></td><td>Project y User</td></tr>
+            <tr><td>🏢 Managed</td><td>Central organization config</td><td>Everything — cannot be overridden</td></tr>
+            <tr><td>🔒 Local</td><td><code>.claude/settings.local.json</code></td><td>Project and User</td></tr>
             <tr><td>📁 Project</td><td><code>.claude/settings.json</code></td><td>User</td></tr>
-            <tr><td>👤 User</td><td><code>~/.claude/settings.json</code></td><td>Nada (menor prioridad)</td></tr>
+            <tr><td>👤 User</td><td><code>~/.claude/settings.json</code></td><td>Nothing (lowest priority)</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-
-    <!-- ══ SETUP ══ -->

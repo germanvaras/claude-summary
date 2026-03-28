@@ -1,0 +1,123 @@
+    <div class="section" id="section-claudemd">
+      <div class="section-header"><h2>📄 CLAUDE.md <span class="badge">Project memory</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/memory" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> CLAUDE.md is your project's persistent memory. Everything you write there, Claude knows from the very first message of every conversation — without you having to repeat it.</div></div>
+
+        <h3>📁 Locations and differences</h3>
+        <table>
+          <thead><tr><th>Location</th><th>Description</th><th>When it loads</th><th>Scope</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>./CLAUDE.md</code></td>
+              <td>At the project root, visible in the repository</td>
+              <td>Whenever Claude runs in that directory</td>
+              <td>Entire project</td>
+            </tr>
+            <tr>
+              <td><code>./.claude/CLAUDE.md</code></td>
+              <td>Inside the <code>.claude/</code> folder. Equivalent in scope to <code>./CLAUDE.md</code>. Useful for keeping the root clean.</td>
+              <td>Whenever Claude runs in that directory</td>
+              <td>Entire project</td>
+            </tr>
+            <tr>
+              <td><code>~/.claude/CLAUDE.md</code></td>
+              <td>Personal global CLAUDE.md. Applies to all your projects. For your personal work preferences.</td>
+              <td>Always, in any project</td>
+              <td>All your projects</td>
+            </tr>
+            <tr>
+              <td><code>./src/CLAUDE.md</code></td>
+              <td>Instructions specific to a subdirectory. Only applies when Claude works inside <code>src/</code>.</td>
+              <td>On-demand: only when Claude works inside that directory</td>
+              <td>That subdirectory only</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div><strong><code>CLAUDE.md</code> vs <code>.claude/CLAUDE.md</code>?</strong> They are equivalent in scope — both load whenever Claude runs from that directory. The difference is visibility: <code>CLAUDE.md</code> at the root is more visible to the team; <code>.claude/CLAUDE.md</code> groups all Claude configuration in one place. Choose based on your project's convention.</div></div>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div><strong>Additive cascade loading:</strong> Claude combines all relevant CLAUDE.md files in cascade — global → project → subdirectory. More specific ones take precedence if there are contradictions. Subdirectory ones load <em>on-demand</em>.</div></div>
+
+        <h3>✍️ What to put in CLAUDE.md?</h3>
+        <ul>
+          <li>🏗️ <strong>Project architecture</strong> — layer structure, patterns used, important decisions</li>
+          <li>📐 <strong>Code standards</strong> — style, naming conventions, linters, formatters</li>
+          <li>🚫 <strong>Explicit restrictions</strong> — "never modify migrations", "don't use DbContext in controllers"</li>
+          <li>🛠️ <strong>Stack and common commands</strong> — build, test, run, deploy</li>
+          <li>🔗 <strong>Business context</strong> — domain glossary, key entities</li>
+        </ul>
+
+        <h3>📏 Recommended length</h3>
+        <p>CLAUDE.md loads in <strong>every conversation</strong> and consumes context tokens. Keep it under <strong>200 lines</strong>. Extensive material belongs in skills with progressive disclosure:</p>
+        <table>
+          <thead><tr><th>Content</th><th>Where to put it</th></tr></thead>
+          <tbody>
+            <tr><td>Project rules and conventions (always needed)</td><td>CLAUDE.md</td></tr>
+            <tr><td>Detailed architecture guides (only when refactoring)</td><td>Skill → references/</td></tr>
+            <tr><td>PR review checklists</td><td>Skill pr-review</td></tr>
+            <tr><td>Internal API documentation</td><td>Skill → references/</td></tr>
+          </tbody>
+        </table>
+
+        <h3>🏗️ Recommended structure</h3>
+        <pre># ProjectName
+
+## Stack
+- [main language/framework]
+- [database]
+- [testing framework]
+
+## Architecture
+[description of main layers or modules]
+
+## Code conventions
+- [naming conventions]
+- [required patterns]
+- [what to avoid]
+
+## Important restrictions
+- [things Claude must never do]
+
+## Common commands
+- build: `[command]`
+- test: `[command]`
+- lint: `[command]`</pre>
+
+        <h3>💡 Complete real-world example</h3>
+        <pre># EcommerceApi
+
+## Stack
+- .NET 8 · ASP.NET Core Minimal APIs
+- Entity Framework Core 8 · SQL Server 2022
+- xUnit · Moq · FluentAssertions
+
+## Architecture
+Clean Architecture: Domain → Application → Infrastructure → API
+- Commands and Queries separated (CQRS)
+- Repositories abstract EF Core from Application
+
+## Code conventions
+- Record types for DTOs and Value Objects
+- Async methods end in Async
+- Never return null: use Result&lt;T&gt; from FluentResults
+- EF Core: AsNoTracking() on read-only queries
+
+## Restrictions
+- Never modify existing migrations — create a new migration
+- Don't use DbContext in Controllers or Application — only in Repositories
+- Don't hardcode connection strings
+
+## Commands
+- build:   `dotnet build`
+- test:    `dotnet test --filter Category=Unit`
+- lint:    `dotnet format`
+- migrate: `dotnet ef migrations add &lt;Name&gt;`</pre>
+
+        <h3>🚀 Auto-generate one with /init</h3>
+        <p>If the project already has code, Claude can analyze the repository and generate an initial CLAUDE.md:</p>
+        <pre>/init</pre>
+        <p>Claude reads the project structure, configuration files (<code>package.json</code>, <code>.csproj</code>, <code>pyproject.toml</code>, etc.) and proposes a CLAUDE.md with the detected stack and conventions. <strong>Review and edit the result before committing it</strong> — Claude can detect the stack correctly but does not know your business restrictions.</p>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>An instruction in the chat can override CLAUDE.md if it directly contradicts what is written there. CLAUDE.md establishes <em>default</em> behavior, not absolute rules. For restrictions that must be impossible to bypass, use deny rules in <code>settings.json</code> permissions.</div></div>
+      </div>
+    </div>

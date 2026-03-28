@@ -1,0 +1,70 @@
+    <div class="section" id="section-update">
+      <div class="section-header"><h2>🔁 CLI Updates <span class="badge">Maintenance</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/quickstart" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Claude Code updates frequently — new features, bug fixes, command changes. Keeping it updated avoids unexpected behavior and gives access to the latest capabilities.</div></div>
+
+        <h3>🔍 Check the installed version</h3>
+        <pre>claude --version</pre>
+        <p>Or from within a session:</p>
+        <pre>/doctor</pre>
+        <p><code>/doctor</code> shows the installed version and may indicate if an update is available.</p>
+
+        <h3>🔄 Update by installation method</h3>
+        <table>
+          <thead><tr><th>Installation method</th><th>How to update</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Native installer (PowerShell)</strong></td>
+              <td>Automatic in the background</td>
+              <td>The native installer manages its own updates. To force an update, run the installation script again.</td>
+            </tr>
+            <tr>
+              <td><strong>WinGet</strong></td>
+              <td><code>winget upgrade Anthropic.ClaudeCode</code></td>
+              <td>Requires manual execution. Does not update automatically.</td>
+            </tr>
+            <tr>
+              <td><strong>npm</strong></td>
+              <td><code>npm update -g @anthropic-ai/claude-code</code></td>
+              <td>Updates to the latest version on npm. Verify with <code>claude --version</code> afterwards.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>⚠️ What can change between versions</h3>
+        <table>
+          <thead><tr><th>Component</th><th>Stability</th><th>What to do</th></tr></thead>
+          <tbody>
+            <tr><td>settings.json format</td><td>Generally stable, minor changes between major versions</td><td>Check <code>claude config list</code> after updating if something stops working</td></tr>
+            <tr><td>Skills and CLAUDE.md</td><td>Very stable — Markdown + YAML frontmatter format</td><td>Rarely break between versions</td></tr>
+            <tr><td>Hooks (event names)</td><td>Stable for main events (PreToolUse, PostToolUse, Stop)</td><td>Verify with <code>/hooks</code> that they are still active after updating</td></tr>
+            <tr><td>Built-in slash commands</td><td>May be added or modified</td><td>Use <code>/help</code> to see those available in the current version</td></tr>
+            <tr><td>MCP (protocol)</td><td>Follows the public spec — generally backward compatible</td><td>Also update MCP server packages periodically</td></tr>
+          </tbody>
+        </table>
+
+        <h3>📦 Update globally installed MCP servers</h3>
+        <p>If you installed MCP servers via global npm, update them periodically:</p>
+        <pre># Update all global npm packages
+npm update -g
+
+# Update a specific server
+npm update -g @modelcontextprotocol/server-github</pre>
+
+        <h3>🔧 If something stops working after updating</h3>
+        <ol>
+          <li>Run <code>/doctor</code> — it reports configuration issues or detected incompatibilities</li>
+          <li>Check <code>claude config list</code> — compare the active configuration with what you expect</li>
+          <li>If hooks or skills stopped working, restart the session (<code>/exit</code> + <code>claude</code>) and verify with <code>/skills</code> and <code>/hooks</code></li>
+          <li>For a serious error, uninstalling and reinstalling with the official installer usually fixes corrupted state issues</li>
+        </ol>
+        <pre># Clean reinstall (native installer)
+irm https://claude.ai/install.ps1 | iex
+
+# Clean reinstall (npm)
+npm uninstall -g @anthropic-ai/claude-code
+npm install -g @anthropic-ai/claude-code</pre>
+
+        <div class="callout info"><span class="callout-icon">📌</span><div>Claude Code updates do not affect your configuration files (<code>settings.json</code>, <code>CLAUDE.md</code>, skills, commands). They only replace the binary.</div></div>
+      </div>
+    </div>

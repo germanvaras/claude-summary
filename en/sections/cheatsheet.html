@@ -1,0 +1,67 @@
+    <div class="section" id="section-cheatsheet">
+      <div class="section-header"><h2>📋 CLI Cheat Sheet <span class="badge">Quick reference</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>Real Claude Code CLI commands — the ones that appear when you type <code>/</code> or when starting a session in the terminal.</div></div>
+        <h3>🚀 Startup commands</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">claude</span></td><td class="cli-desc">Starts interactive session in the current directory</td></tr>
+          <tr><td><span class="cli-cmd">claude "task"</span></td><td class="cli-desc">Runs task in non-interactive mode</td></tr>
+          <tr><td><span class="cli-cmd">claude -p "prompt"</span></td><td class="cli-desc">Headless / print mode: sends prompt and exits (no interactive session)</td></tr>
+          <tr><td><span class="cli-cmd">claude -c</span></td><td class="cli-desc">Resumes the most recent conversation in the current directory (<code>--continue</code>)</td></tr>
+          <tr><td><span class="cli-cmd">claude -r [session]</span></td><td class="cli-desc">Resumes session by ID/name; without arg shows interactive selector (<code>--resume</code>)</td></tr>
+          <tr><td><span class="cli-cmd">claude --model &lt;id&gt;</span></td><td class="cli-desc">Specifies the model to use (e.g.: <code>sonnet</code>, <code>opus</code>)</td></tr>
+          <tr><td><span class="cli-cmd">claude --worktree</span></td><td class="cli-desc">Starts in an isolated git worktree (<code>-w</code>)</td></tr>
+        </table>
+        <h3>⚡ System slash commands</h3>
+        <div class="callout warn"><span class="callout-icon">⚠️</span><div>Not all commands are available in all environments. Availability depends on the plan, platform (CLI, VS Code extension, etc.), and installed version. Use <code>/help</code> to see the ones active in your session.</div></div>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">/help</span></td><td class="cli-desc">Lists all available commands in the current session</td></tr>
+          <tr><td><span class="cli-cmd">/status</span></td><td class="cli-desc">Opens the Status configuration tab</td></tr>
+          <tr><td><span class="cli-cmd">/clear</span></td><td class="cli-desc">Clears the conversation history (aliases: <code>/reset</code>, <code>/new</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/compact [instructions]</span></td><td class="cli-desc">Compresses history to free context space</td></tr>
+          <tr><td><span class="cli-cmd">/init</span></td><td class="cli-desc">Generates an initial CLAUDE.md by analyzing the current project</td></tr>
+          <tr><td><span class="cli-cmd">/config</span></td><td class="cli-desc">Opens the configuration interface (alias: <code>/settings</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/permissions</span></td><td class="cli-desc">View and update permissions (alias: <code>/allowed-tools</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/memory</span></td><td class="cli-desc">Edit CLAUDE.md files and automatic memory</td></tr>
+          <tr><td><span class="cli-cmd">/context</span></td><td class="cli-desc">Visualize current context usage</td></tr>
+          <tr><td><span class="cli-cmd">/model [model]</span></td><td class="cli-desc">Select or change the AI model</td></tr>
+          <tr><td><span class="cli-cmd">/skills</span></td><td class="cli-desc">Lists all available skills for the current directory</td></tr>
+          <tr><td><span class="cli-cmd">/mcp</span></td><td class="cli-desc">Manage MCP server connections</td></tr>
+          <tr><td><span class="cli-cmd">/agents</span></td><td class="cli-desc">Manage agent configurations</td></tr>
+          <tr><td><span class="cli-cmd">/hooks</span></td><td class="cli-desc">View active hook configurations</td></tr>
+          <tr><td><span class="cli-cmd">/doctor</span></td><td class="cli-desc">Installation and configuration diagnostic</td></tr>
+          <tr><td><span class="cli-cmd">/plan [description]</span></td><td class="cli-desc">Enter planning mode (plans only, does not execute)</td></tr>
+          <tr><td><span class="cli-cmd">/resume [session]</span></td><td class="cli-desc">Resume conversation (alias: <code>/continue</code>)</td></tr>
+          <tr><td><span class="cli-cmd">/exit</span></td><td class="cli-desc">Close the session (alias: <code>/quit</code>)</td></tr>
+        </table>
+        <h3>📋 Useful global flags</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">--allowedTools</span></td><td class="cli-desc">Tools that run without permission prompts</td></tr>
+          <tr><td><span class="cli-cmd">--disallowedTools</span></td><td class="cli-desc">Tools removed from the model's context</td></tr>
+          <tr><td><span class="cli-cmd">--output-format</span></td><td class="cli-desc">Output format: <code>text</code>, <code>json</code>, <code>stream-json</code> (print mode)</td></tr>
+          <tr><td><span class="cli-cmd">--max-turns &lt;n&gt;</span></td><td class="cli-desc">Agentic turn limit (print mode)</td></tr>
+          <tr><td><span class="cli-cmd">--verbose</span></td><td class="cli-desc">Detailed turn-by-turn logging</td></tr>
+          <tr><td><span class="cli-cmd">--permission-mode</span></td><td class="cli-desc">Start in a specific mode (e.g.: <code>plan</code>)</td></tr>
+          <tr><td><span class="cli-cmd">--dangerously-skip-permissions</span></td><td class="cli-desc">⚠️ Bypasses all confirmations — automated environments only</td></tr>
+        </table>
+        <h3>📁 Configuration</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">claude config list</span></td><td class="cli-desc">Shows the active configuration</td></tr>
+          <tr><td><span class="cli-cmd">claude config get &lt;key&gt;</span></td><td class="cli-desc">Value of a specific key</td></tr>
+          <tr><td><span class="cli-cmd">claude config set &lt;key&gt; &lt;val&gt;</span></td><td class="cli-desc">Sets a configuration value</td></tr>
+          <tr><td><span class="cli-cmd">claude --version</span></td><td class="cli-desc">Shows the installed version</td></tr>
+        </table>
+        <h3>📊 Quick decision table</h3>
+        <table>
+          <thead><tr><th>What do you need?</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td>Claude to always know X</td><td>📄 CLAUDE.md</td></tr>
+            <tr><td>Claude to know X only when relevant</td><td>🧩 Skill</td></tr>
+            <tr><td>Run an action when you decide</td><td>⚡ Slash Command</td></tr>
+            <tr><td>Automate something when Claude does Y</td><td>🪝 Hook</td></tr>
+            <tr><td>Connect to an API or external service</td><td>🔌 MCP Server</td></tr>
+            <tr><td>Delegate complex work to isolated context</td><td>🤖 Subagent</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

@@ -1,0 +1,154 @@
+    <div class="section" id="section-troubleshoot">
+      <div class="section-header"><h2>🔧 Troubleshooting <span class="badge">Common errors</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/troubleshooting" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout info"><span class="callout-icon">📌</span><div>The most frequent issues when working with Claude Code, organized by symptom. Click each one to see the cause and solution.</div></div>
+
+        <h3>🧩 Skills</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            My skill doesn't activate when I ask for it <span class="trouble-tag tag-skill">Skill</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> Claude does not activate the skill even though the request seems relevant.</div></div>
+            <p><strong>Causes and solutions:</strong></p>
+            <ul>
+              <li>🔄 <strong>You did not restart Claude Code</strong> after creating or editing the skill. Skills load at session start — always close with <code>/exit</code> and reopen with <code>claude</code> after changes.</li>
+              <li>📝 <strong>The description is too vague.</strong> If it only says "helps with code," Claude doesn't know when to use it. Add verbs and specific phrases: <em>"Use when reviewing PRs, checking code before merge, or when asked for feedback on a branch."</em></li>
+              <li>📁 <strong>The file is in the wrong location.</strong> The structure must be <code>.claude/skills/skill-name/SKILL.md</code> — not <code>.claude/skills/SKILL.md</code> directly. Each skill needs its own subfolder.</li>
+              <li>✏️ <strong>The frontmatter has errors.</strong> The <code>name</code> and <code>description</code> fields are required and must be between the <code>---</code> dashes exactly.</li>
+            </ul>
+            <p><strong>Quick check:</strong></p>
+            <pre>/skills</pre>
+            <p>If your skill does not appear in the list, the problem is location or frontmatter. If it appears but does not activate, the problem is the description.</p>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            The wrong skill activates when I have two with similar names <span class="trouble-tag tag-skill">Skill</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> Claude activates the project skill instead of the personal one, or vice versa.</div></div>
+            <p>The priority order is: <strong>Managed → Personal → Project → Plugins</strong>. If two skills have the same <code>name</code>, the one with higher priority wins.</p>
+            <ul>
+              <li>Use descriptive names to avoid collisions: <code>frontend-review</code> instead of <code>review</code>.</li>
+              <li>If you want the project skill to override the personal one, the only option is to rename the personal skill or give it a different name.</li>
+              <li>Use <code>/skills</code> to see the origin (personal/project) of each active skill.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            The skill loads but Claude doesn't follow the instructions correctly <span class="trouble-tag tag-skill">Skill</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> Claude confirms it activated the skill but the result does not respect the defined format or steps.</div></div>
+            <ul>
+              <li>📏 <strong>SKILL.md is too long.</strong> If it exceeds 500 lines, Claude may skip parts. Move extensive material to files in <code>references/</code> and reference them from SKILL.md.</li>
+              <li>⚔️ <strong>Conflict with CLAUDE.md.</strong> If CLAUDE.md has instructions that contradict the skill, they can compete. Check for overlap.</li>
+              <li>🔢 <strong>Ambiguous instructions.</strong> Numbered steps and bullet lists work better than long paragraphs for procedural instructions.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>🪝 Hooks</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            The hook doesn't run after Claude edits a file <span class="trouble-tag tag-hook">Hook</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> Claude writes or edits files but the hook does not fire.</div></div>
+            <ul>
+              <li>🔄 <strong>Restart Claude Code.</strong> Hooks are read at session start.</li>
+              <li>📄 <strong>Check the settings.json JSON syntax.</strong> A syntax error silences all hooks. Validate with:</li>
+            </ul>
+            <pre>claude config list</pre>
+            <ul>
+              <li>🎯 <strong>Review the matcher.</strong> <code>"matcher": "Write"</code> only activates on writes. For edits too, use <code>"matcher": "Write|Edit"</code>.</li>
+              <li>📁 <strong>settings.json location.</strong> Must be at <code>.claude/settings.json</code> (project) or <code>~/.claude/settings.json</code> (global).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            The hook fails with "command not found" or path errors <span class="trouble-tag tag-hook">Hook</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> The hook fires but the command is not found or fails with a path error.</div></div>
+            <ul>
+              <li>🛣️ <strong>Hooks run with the system PATH, not the interactive shell's PATH.</strong> Use absolute paths. On Windows, check with <code>where npm</code> for the full path.</li>
+              <li>📦 <strong>The command must be in the project directory.</strong> Prefix with: <code>cd C:\path\project &amp;&amp; npm run lint</code></li>
+              <li>🔑 <strong>Execution permissions.</strong> On Linux/macOS, check: <code>chmod +x script.sh</code></li>
+              <li>🔍 <strong>Use verbose mode to see the exact error:</strong></li>
+            </ul>
+            <pre>claude --verbose</pre>
+          </div>
+        </div>
+
+        <h3>🔌 MCP</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            The MCP server appears as disconnected <span class="trouble-tag tag-mcp">MCP</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> <code>/mcp</code> shows the server as offline or Claude says it cannot connect.</div></div>
+            <ul>
+              <li>📦 <strong>The package is not installed.</strong> With <code>npx -y</code> it installs automatically, but may fail on corporate networks. Install manually first: <code>npm install -g @modelcontextprotocol/server-NAME</code></li>
+              <li>🔑 <strong>Missing environment variables.</strong> Verify the variables in the <code>env</code> block of settings.json are defined and correct.</li>
+              <li>🔒 <strong>Connectivity issue.</strong> If the DB or API is remote, verify the host is accessible from your machine.</li>
+              <li>📋 <strong>Check server logs with verbose:</strong></li>
+            </ul>
+            <pre>claude --verbose</pre>
+            <p>In verbose mode you'll see the MCP server initialization error in detail.</p>
+          </div>
+        </div>
+
+        <h3>📄 CLAUDE.md / General</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            Claude ignores CLAUDE.md instructions <span class="trouble-tag tag-claude">CLAUDE.md</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> Claude does not respect conventions or restrictions defined in CLAUDE.md.</div></div>
+            <ul>
+              <li>📏 <strong>CLAUDE.md is too long.</strong> If it has hundreds of lines, instructions at the end may fall outside the effective focus. Keep it under 200 lines and move extensive material to skills.</li>
+              <li>⚔️ <strong>Contradictory instruction in the chat.</strong> If you give a contrary instruction in the same message, it may override CLAUDE.md. CLAUDE.md sets defaults, not absolute rules. For absolute restrictions, use <code>deny</code> in permissions.</li>
+              <li>📁 <strong>File misspelled or mislocated.</strong> Must be exactly <code>CLAUDE.md</code> (uppercase) at the project root, or at <code>.claude/CLAUDE.md</code>.</li>
+              <li>💡 <strong>The context filled up.</strong> In long sessions, CLAUDE.md may lose effectiveness. Use <code>/compact</code> to compress the history.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            The context fills up quickly and Claude starts "forgetting" things <span class="trouble-tag tag-gen">General</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> In long sessions, Claude starts ignoring instructions or losing the thread of the task.</div></div>
+            <ul>
+              <li>🗜️ <strong>Use <code>/compact</code></strong> to compress the conversation history without losing essential context. You can add focus instructions: <code>/compact focus on the changes in the Orders module</code></li>
+              <li>📂 <strong>Move CLAUDE.md content to skills.</strong> What does not need to be always present consumes context unnecessarily.</li>
+              <li>✂️ <strong>Break up long tasks.</strong> Instead of one giant session, use subagents or separate sessions for different modules.</li>
+              <li>🔄 <strong>Start a new session</strong> with just <code>claude</code> for a clean context. CLAUDE.md and skills reload automatically. Use <code>claude -c</code> to resume the previous session (does not compress — continues where it was).</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>🔑 Authentication</h3>
+        <div class="trouble-block">
+          <div class="trouble-header" onclick="toggleTrouble(this)">
+            Claude Code asks to login every time I open it <span class="trouble-tag tag-gen">Auth</span> <span class="arrow">▶</span>
+          </div>
+          <div class="trouble-body">
+            <div class="callout err"><span class="callout-icon">🔴</span><div><strong>Symptom:</strong> The session token does not persist between sessions.</div></div>
+            <ul>
+              <li>📁 <strong>The credentials file may have been deleted.</strong> Verify it exists: <code>C:\Users\&lt;user&gt;\.claude\credentials.json</code></li>
+              <li>🔒 <strong>File permissions.</strong> The Claude Code process must be able to read and write that file.</li>
+              <li>🔑 <strong>Permanent alternative:</strong> Set <code>ANTHROPIC_API_KEY</code> as a system environment variable with <code>setx</code>. No browser login needed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>

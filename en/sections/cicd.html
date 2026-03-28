@@ -1,0 +1,119 @@
+    <div class="section" id="section-cicd">
+      <div class="section-header"><h2>🔄 Claude Code in CI/CD <span class="badge">Automation</span><a class="doc-link" href="https://docs.anthropic.com/en/docs/claude-code/github-actions" target="_blank" rel="noopener">↗ Docs</a></h2></div>
+      <div class="content">
+        <div class="callout tip"><span class="callout-icon">💡</span><div><strong>Key concept:</strong> Claude Code has a headless (non-interactive) mode designed for CI/CD pipelines and automation. It runs, completes the task, and exits — no interactive session, with structured output.</div></div>
+
+        <h3>🚀 Headless mode — claude -p</h3>
+        <p>The <code>-p</code> flag (print / headless) sends a prompt, waits for the full response, and exits. It does not open an interactive session.</p>
+        <pre># Basic syntax
+claude -p "task you want to execute"
+
+# Example: auto-generate changelog
+claude -p "generate the changelog for version 2.4.0 based on commits since the v2.3.0 tag"
+
+# Example: review code before merge
+claude -p "review the modified files in this PR and list any critical issues"</pre>
+
+        <h3>📤 Output formats</h3>
+        <p>In headless mode you can control the output format:</p>
+        <table>
+          <thead><tr><th>Flag</th><th>Format</th><th>When to use it</th></tr></thead>
+          <tbody>
+            <tr><td><code>--output-format text</code></td><td>Plain text (default)</td><td>Scripts that read the output as a string</td></tr>
+            <tr><td><code>--output-format json</code></td><td>JSON with the full response at the end</td><td>Integration with tools that parse JSON</td></tr>
+            <tr><td><code>--output-format stream-json</code></td><td>JSON events as a stream, one per line (NDJSON)</td><td>Process the response in real time as it arrives</td></tr>
+          </tbody>
+        </table>
+        <pre># JSON output for script parsing
+claude -p "list classes with coverage below 80%" --output-format json
+
+# Stream for real-time processing
+claude -p "refactor OrderService.cs" --output-format stream-json | jq '.content'</pre>
+
+        <h3>🔒 Authentication in CI/CD</h3>
+        <p>In pipelines without a graphical interface, browser login does not work. Always use an API key:</p>
+        <pre># GitHub Actions — secret configured in the repository
+env:
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+# Docker
+docker run -e ANTHROPIC_API_KEY=sk-ant-... my-image claude -p "task"
+
+# Environment variables in CI system
+export ANTHROPIC_API_KEY="sk-ant-api03-..."
+claude -p "task"</pre>
+
+        <h3>⚙️ Important CI/CD flags</h3>
+        <table class="cli-table">
+          <tr><td><span class="cli-cmd">--max-turns &lt;n&gt;</span></td><td class="cli-desc">Limits the number of agentic turns. Prevents Claude from entering infinite loops. Recommended: 10–30 depending on complexity.</td></tr>
+          <tr><td><span class="cli-cmd">--dangerously-skip-permissions</span></td><td class="cli-desc">Bypasses all interactive confirmations. Required in CI (no user to approve). Use with <code>deny</code> rules in settings.json as a guardrail.</td></tr>
+          <tr><td><span class="cli-cmd">--allowedTools Read,Write,Bash</span></td><td class="cli-desc">Restricts which tools Claude can use in this run. Principle of least privilege.</td></tr>
+          <tr><td><span class="cli-cmd">--disallowedTools Bash</span></td><td class="cli-desc">Blocks specific tools for this run.</td></tr>
+          <tr><td><span class="cli-cmd">--output-format json</span></td><td class="cli-desc">JSON output — easier to parse in CI scripts.</td></tr>
+          <tr><td><span class="cli-cmd">--verbose</span></td><td class="cli-desc">Detailed turn-by-turn logging. Useful for debugging pipelines.</td></tr>
+        </table>
+
+        <h3>📋 Example — GitHub Actions</h3>
+        <pre># .github/workflows/claude-review.yml
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run Claude review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "Review the modified files in this PR. \
+            List critical issues, improvement suggestions, and any missing tests. \
+            Format: markdown list with severity [critical/suggestion/nitpick]." \
+            --max-turns 20 \
+            --allowedTools Read,Grep,Glob \
+            --output-format text</pre>
+
+        <h3>📋 Example — Automation script</h3>
+        <pre>#!/bin/bash
+# generate-release-notes.sh
+
+VERSION=$1
+PREV_VERSION=$2
+
+echo "Generating release notes for $VERSION..."
+
+NOTES=$(claude -p "Generate release notes for version $VERSION. \
+  Based on commits from the $PREV_VERSION tag to HEAD. \
+  Group by: Features, Bug Fixes, Breaking Changes. \
+  Markdown format." \
+  --max-turns 5 \
+  --output-format text)
+
+echo "$NOTES" > "RELEASE_NOTES_$VERSION.md"
+echo "Done: RELEASE_NOTES_$VERSION.md"</pre>
+
+        <h3>🛡️ Security best practices in CI/CD</h3>
+        <table>
+          <thead><tr><th>Practice</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Use <code>--allowedTools</code> with least privilege</td><td>In CI, Claude doesn't need all tools. Restrict to what the task actually needs.</td></tr>
+            <tr><td>Configure <code>deny</code> rules in project settings.json</td><td>Deny rules work even with <code>--dangerously-skip-permissions</code></td></tr>
+            <tr><td>Never hardcode the API key in code or committed files</td><td>Use CI secrets (GitHub Secrets, etc.)</td></tr>
+            <tr><td>Always use <code>--max-turns</code> in CI</td><td>Prevents runs that never end and consume credits uncontrolled</td></tr>
+            <tr><td>Check the process exit code</td><td>claude -p returns 0 on success, non-zero on error — use it to control the pipeline</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout ok"><span class="callout-icon">✅</span><div><strong>Ideal combination for CI/CD:</strong> <code>ANTHROPIC_API_KEY</code> in secret + <code>--dangerously-skip-permissions</code> + <code>--allowedTools</code> with least privilege + <code>--max-turns</code> as a safety limit + <code>deny</code> rules in project settings.json.</div></div>
+      </div>
+    </div>

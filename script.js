@@ -1,3 +1,9 @@
+function getLang() {
+  var path = window.location.pathname.replace(/\\/g, '/');
+  if (path.indexOf('/en/') !== -1) return 'en';
+  return 'es';
+}
+
 const SECTIONS = [
   'disclaimer',
   'setup','auth','modelo','tokens','modelos','sesiones',
@@ -119,15 +125,14 @@ function initUI() {
   };
 
   // QUIZ
+  const lang = getLang();
   let answered = {};
 
   document.querySelectorAll('.quiz-option').forEach(opt => {
     opt.addEventListener('click', function() {
       const q = this.closest('.quiz-q');
       const idx = [...document.querySelectorAll('.quiz-q')].indexOf(q);
-      // Si la pregunta ya fue corregida (post-submit), no permitir cambios
       if (q.dataset.locked) return;
-      // Actualizar selección — quitar selected de todas y poner en la clickeada
       answered[idx] = this.dataset.val;
       q.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
       this.classList.add('selected');
@@ -151,14 +156,16 @@ function initUI() {
       if (chosen === correct) {
         score++;
         fb.classList.add('ok');
-        fb.textContent = '✅ Correcto.';
+        fb.textContent = lang === 'en' ? '✅ Correct.' : '✅ Correcto.';
       } else if (chosen) {
         fb.classList.add('bad');
         const correctText = q.querySelector(`[data-val="${correct}"]`).textContent;
-        fb.textContent = `❌ Incorrecto. La respuesta era: ${correctText}`;
+        fb.textContent = lang === 'en'
+          ? '❌ Incorrect. The correct answer was: ' + correctText
+          : '❌ Incorrecto. La respuesta era: ' + correctText;
       } else {
         fb.classList.add('bad');
-        fb.textContent = '⏭️ Sin responder.';
+        fb.textContent = lang === 'en' ? '⏭️ Not answered.' : '⏭️ Sin responder.';
       }
     });
 
@@ -169,7 +176,17 @@ function initUI() {
     document.getElementById('result-score').textContent = `${score} / ${total}`;
 
     const pct = score / total;
-    const verdicts = [
+
+    const verdicts_en = [
+      { min: 1.0,  emoji: '🏆', verdict: 'Perfect! You nailed it.', msg: 'You either memorized the docs or you\'re just that good. Either way, impressive. Close this tab and start charging as a Claude Code expert.' },
+      { min: 0.82, emoji: '🎉', verdict: 'Excellent! You know what you\'re doing.', msg: 'You clearly read the docs carefully. Only missed the subtlest details — the 18% that separates Claude Code users from those who truly understand it.' },
+      { min: 0.65, emoji: '😅', verdict: 'Passable. Barely.', msg: 'You know the basics but the details slip away. The docs are still there — they won\'t bite if you read them again. We strongly recommend it.' },
+      { min: 0.47, emoji: '🤔', verdict: 'Hmm. Did you read anything?', msg: 'Some things got through. A few sparks. Unfortunately not enough. The good news is the docs aren\'t going anywhere and there\'s a handy search function.' },
+      { min: 0.29, emoji: '😬', verdict: 'That was... an attempt.', msg: 'We can\'t say you didn\'t try because we don\'t know if you did. The results speak for themselves. There\'s a whole Troubleshooting section — might be useful. For life in general.' },
+      { min: 0,    emoji: '💀', verdict: 'That was painful to watch.', msg: 'Honestly we don\'t know how you got here. Did you open the docs at all, or just clicked Quiz directly? No judgment. Well, a bit. Go back to Installation and take notes.' }
+    ];
+
+    const verdicts_es = [
       { min: 1.0,  emoji: '🏆', verdict: '¡Perfecto! Sos un crack.', msg: 'Memorizaste la documentación o sos un genio. De cualquier forma, impresionante. Podés cerrar esta página y empezar a cobrar como experto en Claude Code.' },
       { min: 0.82, emoji: '🎉', verdict: '¡Muy bien! Sabés lo que hacés.', msg: 'Claramente leíste la documentación con atención. Solo fallaste en los detalles más sutiles — ese 18% que separa a los que usan Claude Code de los que lo entienden de verdad.' },
       { min: 0.65, emoji: '😅', verdict: 'Pasable. Apenas.', msg: 'Sabés lo básico pero los detalles se te escapan. La documentación sigue disponible — no te va a morder si la leés de nuevo. De hecho, te lo recomendamos fuertemente.' },
@@ -178,6 +195,7 @@ function initUI() {
       { min: 0,    emoji: '💀', verdict: 'Eso fue doloroso de presenciar.', msg: 'Sinceramente no sabemos cómo llegaste hasta acá. ¿Abriste la documentación o solo le diste clic al Quiz directamente? No te juzgamos. Bueno, un poco sí. Volvé a empezar desde Instalación, tomá notas.' }
     ];
 
+    const verdicts = lang === 'en' ? verdicts_en : verdicts_es;
     const v = verdicts.find(x => pct >= x.min);
     document.getElementById('result-emoji').textContent = v.emoji;
     document.getElementById('result-verdict').textContent = v.verdict;
